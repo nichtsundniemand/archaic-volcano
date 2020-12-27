@@ -18,6 +18,8 @@ static struct retro_callbacks {
 	retro_input_state_t input_state;
 } retro_callbacks;
 
+static retro_hw_render_interface_vulkan *vulkan;
+
 // Core basics
 RETRO_API unsigned int retro_api_version() {
 	return RETRO_API_VERSION;
@@ -72,14 +74,25 @@ RETRO_API void retro_set_controller_port_device(
 ) {}
 
 // Core runtime stuff
+RETRO_CALLCONV void retro_context_reset() {
+	if(!retro_callbacks.env(RETRO_ENVIRONMENT_GET_HW_RENDER_INTERFACE, (void **)&vulkan) || !vulkan) {
+		LOG_F(FATAL, "Could not fetch HW-render interface from frontend!");
+		return;
+	}
+
+	LOG_F(
+		INFO, "Successfully fetched HW-interface: vulkan:\n\tinterface_version: %d\n\thandle: %p\n",
+		vulkan->interface_version, vulkan->handle
+	);
+}
+
 RETRO_API bool retro_load_game([[maybe_unused]] const struct retro_game_info *game) {
 	// Initialize vulkan-context
-	retro_hw_context_reset_t context_reset   = nullptr;
 	retro_hw_context_reset_t context_destroy = nullptr;
 
 	static struct retro_hw_render_callback hw_render = {
 		.context_type    = RETRO_HW_CONTEXT_VULKAN,
-		.context_reset   = context_reset,
+		.context_reset   = &retro_context_reset,
 		.version_major   = VK_MAKE_VERSION(1, 0, 18),
 		.version_minor   = 0,
 		.cache_context   = true,
