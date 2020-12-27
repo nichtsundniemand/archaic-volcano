@@ -10,6 +10,7 @@ static const char* library_version = "v0.0.1";
 static const char* valid_extensions = "";
 
 static struct retro_callbacks {
+  retro_environment_t env;
   retro_video_refresh_t video;
   retro_audio_sample_t audio;
   retro_audio_sample_batch_t audio_batch;
@@ -36,6 +37,8 @@ RETRO_API void retro_get_system_info(retro_system_info* info) {
 }
 
 RETRO_API void retro_set_environment(retro_environment_t cb) {
+  retro_callbacks.env = cb;
+
   bool no_rom = true;
   cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
 }
@@ -75,6 +78,31 @@ RETRO_API void retro_set_controller_port_device(
 
 // Core runtime stuff
 RETRO_API bool retro_load_game([[maybe_unused]] const struct retro_game_info* game) {
+  // Initialize vulkan-context
+  retro_hw_context_reset_t context_reset = nullptr;
+  retro_hw_context_reset_t context_destroy = nullptr;
+  static struct retro_hw_render_callback hw_render = {
+    .context_type = RETRO_HW_CONTEXT_VULKAN,
+    .context_reset = context_reset,
+    .version_major = VK_MAKE_VERSION(1, 0, 18),
+    .version_minor = 0,
+    .cache_context = true,
+    .context_destroy = context_destroy,
+  };
+  if (!retro_callbacks.env(RETRO_ENVIRONMENT_SET_HW_RENDER, &hw_render))
+    return false;
+
+  static const struct retro_hw_render_context_negotiation_interface_vulkan iface = {
+    RETRO_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE_VULKAN,
+    RETRO_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE_VULKAN_VERSION,
+
+    //get_application_info,
+    NULL,
+    NULL,
+  };
+
+  retro_callbacks.env(RETRO_ENVIRONMENT_SET_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE, (void*)&iface);
+
   return true;
 }
 
