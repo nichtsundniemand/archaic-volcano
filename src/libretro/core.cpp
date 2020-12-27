@@ -1,4 +1,5 @@
 #include <libretro_vulkan.h>
+#include <vulkan/vulkan_symbol_wrapper.h>
 
 #include <loguru.hpp>
 
@@ -84,6 +85,10 @@ RETRO_CALLCONV void retro_context_reset() {
 		INFO, "Successfully fetched HW-interface: vulkan:\n\tinterface_version: %d\n\thandle: %p\n",
 		vulkan->interface_version, vulkan->handle
 	);
+
+	vulkan_symbol_wrapper_init(vulkan->get_instance_proc_addr);
+	vulkan_symbol_wrapper_load_core_instance_symbols(vulkan->instance);
+	vulkan_symbol_wrapper_load_core_device_symbols(vulkan->device);
 }
 
 RETRO_API bool retro_load_game([[maybe_unused]] const struct retro_game_info *game) {
