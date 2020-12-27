@@ -2,8 +2,8 @@
 
 #include <loguru.hpp>
 
-const int w = 1280;
-const int h = 720;
+#define WIDTH 1280
+#define HEIGHT 720
 
 static const char* library_name = "Archaic Volcano";
 static const char* library_version = "v0.0.1";
@@ -17,11 +17,6 @@ static struct retro_callbacks {
   retro_input_poll_t input_poll;
   retro_input_state_t input_state;
 } retro_callbacks;
-
-static unsigned short buffer[w * h];
-
-// Forward declarations
-unsigned int abs(int);
 
 // Core basics
 RETRO_API unsigned int retro_api_version () {
@@ -116,8 +111,8 @@ RETRO_API bool retro_load_game_special(
 
 RETRO_API void retro_get_system_av_info(retro_system_av_info *info) {
   info->geometry = retro_game_geometry {
-    .base_width  = w,
-    .base_height = h,
+    .base_width  = WIDTH,
+    .base_height = HEIGHT,
     .max_width   = 1920,
     .max_height  = 1080,
   };
@@ -132,16 +127,7 @@ RETRO_API unsigned retro_get_region(void) {
 }
 
 RETRO_API void retro_run(void) {
-  for(int y = 0; y < h; y++) {
-    for(int x = 0; x < w; x++) {
-      buffer[x + w * y] = 0;
-      if(abs(x - y) > 10) {
-        buffer[x + w * y] = 65535;
-      }
-    }
-  }
-
-  retro_callbacks.video(buffer, w, h, sizeof(unsigned short) * w);
+  retro_callbacks.video(RETRO_HW_FRAME_BUFFER_VALID, WIDTH, HEIGHT, 0);
 }
 
 RETRO_API void retro_reset(void) {}
@@ -184,11 +170,3 @@ RETRO_API void retro_cheat_set(
   [[maybe_unused]] bool enabled,
   [[maybe_unused]] const char *code
 ) {}
-
-// Misc.
-unsigned int abs(int x) {
-  if(x < 0)
-    return -x;
-
-  return x;
-}
