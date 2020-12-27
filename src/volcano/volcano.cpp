@@ -1,10 +1,16 @@
 #include "volcano.hpp"
 
+#include <vulkan/vulkan_symbol_wrapper.h>
+
 #include <cstdio>
 
 namespace volcano {
   void renderer::init(retro_hw_render_interface_vulkan* vulkan) {
     fprintf(stderr, "volcano_init(): Initialization begun!\n");
+
+    vulkan_symbol_wrapper_init(vulkan->get_instance_proc_addr);
+    vulkan_symbol_wrapper_load_core_instance_symbols(vulkan->instance);
+    vulkan_symbol_wrapper_load_core_device_symbols(vulkan->device);
 
     vkGetPhysicalDeviceProperties(vulkan->gpu, &this->gpu_properties);
     vkGetPhysicalDeviceMemoryProperties(vulkan->gpu, &this->memory_properties);
