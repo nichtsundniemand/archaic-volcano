@@ -342,6 +342,85 @@ namespace volcano {
 			vkDestroyShaderModule(device, shader_stage.module, nullptr);
 	}
 
+	void renderer::init_swapchain() {
+		VkDevice device = vulkan_if->device;
+
+		for(unsigned i = 0; i < this->num_swapchain_images; i++) {
+			VkImageCreateInfo image = {
+				.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+				.flags         = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT,
+				.imageType     = VK_IMAGE_TYPE_2D,
+				.format        = VK_FORMAT_R8G8B8A8_UNORM,
+				.extent        = {
+					.width  = 1280,
+					.height = 720,
+					.depth  = 1,
+				},
+				.mipLevels     = 1,
+				.arrayLayers   = 1,
+				.samples       = VK_SAMPLE_COUNT_1_BIT,
+				.tiling        = VK_IMAGE_TILING_OPTIMAL,
+				.usage         =
+					VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+					VK_IMAGE_USAGE_SAMPLED_BIT |
+					VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			};
+			VkImage newImage;
+			vkCreateImage(device, &image, nullptr, &newImage);
+
+			VkMemoryRequirements mem_reqs;
+			vkGetImageMemoryRequirements(device, newImage, &mem_reqs);
+
+			VkMemoryAllocateInfo alloc = {
+				.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+				.allocationSize  = mem_reqs.size,
+				.memoryTypeIndex = find_memory_type_from_requirements(
+					mem_reqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+				),
+			};
+			vkAllocateMemory(device, &alloc, nullptr, &this->image_memory[i]);
+			vkBindImageMemory(device, newImage, this->image_memory[i], 0);
+
+			this->images[i].create_info = {
+				.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.image            = newImage,
+				.viewType         = VK_IMAGE_VIEW_TYPE_2D,
+				.format           = VK_FORMAT_R8G8B8A8_UNORM,
+				.components       = {
+					.r = VK_COMPONENT_SWIZZLE_R,
+					.g = VK_COMPONENT_SWIZZLE_G,
+					.b = VK_COMPONENT_SWIZZLE_B,
+					.a = VK_COMPONENT_SWIZZLE_A,
+				},
+				.subresourceRange = {
+					.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel   = 0,
+					.levelCount     = 1,
+					.baseArrayLayer = 0,
+					.layerCount     = 1,
+				},
+			};
+
+			vkCreateImageView(
+				device, &this->images[i].create_info,
+				nullptr, &this->images[i].image_view
+			);
+			this->images[i].image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			VkFramebufferCreateInfo fb_info = {
+				.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.renderPass      = this->render_pass,
+				.attachmentCount = 1,
+				.pAttachments    = &this->images[i].image_view,
+				.width           = 1280,
+				.height          = 720,
+				.layers          = 1,
+			};
+			vkCreateFramebuffer(device, &fb_info, nullptr, &this->framebuffers[i]);
+		}
+	}
+
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		vulkan_if = vulkan;
 		fprintf(stderr, "volcano_init(): Initialization begun!\n");
@@ -369,5 +448,6 @@ namespace volcano {
 
 		init_render_pass(VK_FORMAT_R8G8B8A8_UNORM);
 		init_pipeline();
+		init_swapchain();
 	}
 }

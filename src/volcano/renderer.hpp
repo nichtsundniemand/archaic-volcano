@@ -3,7 +3,7 @@
 
 #include <libretro_vulkan.h>
 
-#define MAX_SYNC 3
+#define MAX_SYNC 4
 
 namespace volcano {
 	struct buffer {
@@ -18,6 +18,9 @@ namespace volcano {
 
 			unsigned num_swapchain_images;
 			uint32_t swapchain_mask;
+			VkDeviceMemory image_memory[MAX_SYNC];
+			struct retro_vulkan_image images[MAX_SYNC];
+			VkFramebuffer framebuffers[MAX_SYNC];
 
 			VkPipelineCache pipeline_cache;
 			VkPipelineLayout pipeline_layout;
@@ -41,6 +44,7 @@ namespace volcano {
 			void init_render_pass(VkFormat format);
 			VkShaderModule create_shader_module(const uint32_t *data, size_t size);
 			void init_pipeline();
+			void init_swapchain();
 
 		public:
 			void init(retro_hw_render_interface_vulkan *);
