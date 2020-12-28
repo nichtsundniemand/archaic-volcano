@@ -164,6 +164,35 @@ namespace volcano {
     vkCreatePipelineLayout(device, &layout_info, nullptr, &this->pipeline_layout);
   }
 
+  void renderer::init_render_pass(VkFormat format) {
+    VkAttachmentDescription attachment = {
+      .format         = format,
+      .samples        = VK_SAMPLE_COUNT_1_BIT,
+      .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
+      .storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
+      .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+      .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+      .initialLayout  = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      .finalLayout    = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    };
+
+    VkAttachmentReference color_ref = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
+    VkSubpassDescription subpass = {
+      .pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS,
+      .colorAttachmentCount = 1,
+      .pColorAttachments    = &color_ref,
+    };
+
+    VkRenderPassCreateInfo rp_info = {
+      .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+      .attachmentCount = 1,
+      .pAttachments    = &attachment,
+      .subpassCount    = 1,
+      .pSubpasses      = &subpass,
+    };
+    vkCreateRenderPass(vulkan_if->device, &rp_info, nullptr, &this->render_pass);
+  }
+
   void renderer::init(retro_hw_render_interface_vulkan* vulkan) {
     vulkan_if = vulkan;
     fprintf(stderr, "volcano_init(): Initialization begun!\n");
@@ -190,5 +219,7 @@ namespace volcano {
 
     VkPipelineCacheCreateInfo pipeline_cache_info = { VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
     vkCreatePipelineCache(vulkan->device, &pipeline_cache_info, nullptr, &this->pipeline_cache);
+
+    init_render_pass(VK_FORMAT_R8G8B8A8_UNORM);
   }
 }
