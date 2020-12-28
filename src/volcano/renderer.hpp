@@ -22,6 +22,7 @@ namespace volcano {
 			VkPipelineCache pipeline_cache;
 			VkPipelineLayout pipeline_layout;
 			VkRenderPass render_pass;
+			VkPipeline pipeline;
 
 			VkCommandPool cmd_pool[MAX_SYNC];
 			VkCommandBuffer cmd[MAX_SYNC];
@@ -38,6 +39,8 @@ namespace volcano {
 			void init_command();
 			void init_descriptor();
 			void init_render_pass(VkFormat format);
+			VkShaderModule create_shader_module(const uint32_t *data, size_t size);
+			void init_pipeline();
 
 		public:
 			void init(retro_hw_render_interface_vulkan *);

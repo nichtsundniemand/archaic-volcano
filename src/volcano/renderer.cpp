@@ -198,6 +198,150 @@ namespace volcano {
 		vkCreateRenderPass(vulkan_if->device, &rp_info, nullptr, &this->render_pass);
 	}
 
+	VkShaderModule renderer::create_shader_module(const uint32_t *data, size_t size) {
+		VkShaderModule module;
+
+		VkShaderModuleCreateInfo module_info = {
+			.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+			.codeSize = size,
+			.pCode    = data,
+		};
+		vkCreateShaderModule(vulkan_if->device, &module_info, nullptr, &module);
+
+		return module;
+	}
+
+	void renderer::init_pipeline() {
+		VkDevice device = vulkan_if->device;
+
+		VkPipelineInputAssemblyStateCreateInfo input_assembly = {
+			.sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+			.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+		};
+
+		static const std::vector<VkVertexInputAttributeDescription> attributes {
+			{
+				.location = 0,
+				.binding  = 0,
+				.format   = VK_FORMAT_R32G32B32A32_SFLOAT,
+				.offset   = 0,
+			}, {
+				.location = 1,
+				.binding  = 0,
+				.format   = VK_FORMAT_R32G32B32A32_SFLOAT,
+				.offset   = 4 * sizeof(float),
+			},
+		};
+
+		VkVertexInputBindingDescription binding = {
+			.binding   = 0,
+			.stride    = sizeof(float) * 8,
+			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+		};
+
+		VkPipelineVertexInputStateCreateInfo vertex_input = {
+			.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+			.vertexBindingDescriptionCount   = 1,
+			.pVertexBindingDescriptions      = &binding,
+			.vertexAttributeDescriptionCount = (uint32_t)attributes.size(),
+			.pVertexAttributeDescriptions    = attributes.data(),
+		};
+
+		VkPipelineRasterizationStateCreateInfo raster = {
+			.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+			.depthClampEnable        = false,
+			.rasterizerDiscardEnable = false,
+			.polygonMode             = VK_POLYGON_MODE_FILL,
+			.cullMode                = VK_CULL_MODE_BACK_BIT,
+			.frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+			.depthBiasEnable         = false,
+			.lineWidth               = 1.0f,
+		};
+
+		VkPipelineColorBlendAttachmentState blend_attachment = {
+			.blendEnable    = false,
+			.colorWriteMask = 0xf,
+		};
+
+		VkPipelineColorBlendStateCreateInfo blend = {
+			.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+			.attachmentCount = 1,
+			.pAttachments    = &blend_attachment,
+		};
+
+		VkPipelineViewportStateCreateInfo viewport = {
+			.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+			.viewportCount = 1,
+			.scissorCount  = 1,
+		};
+
+		VkPipelineDepthStencilStateCreateInfo depth_stencil = {
+			.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+			.depthTestEnable       = false,
+			.depthWriteEnable      = false,
+			.depthBoundsTestEnable = false,
+			.stencilTestEnable     = false,
+		};
+
+		VkPipelineMultisampleStateCreateInfo multisample = {
+			.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+			.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+		};
+
+		static const std::vector<VkDynamicState> dynamics {
+			VK_DYNAMIC_STATE_VIEWPORT,
+			VK_DYNAMIC_STATE_SCISSOR,
+		};
+
+		VkPipelineDynamicStateCreateInfo dynamic = {
+			.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+			.dynamicStateCount = (uint32_t)dynamics.size(),
+			.pDynamicStates    = dynamics.data(),
+		};
+
+		static const uint32_t triangle_vert[] =
+			#include "triangle.vert.inc"
+		;
+
+		static const uint32_t triangle_frag[] =
+			#include "triangle.frag.inc"
+		;
+
+		static const std::vector<VkPipelineShaderStageCreateInfo> shader_stages {
+			{
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+				.stage  = VK_SHADER_STAGE_VERTEX_BIT,
+				.module = create_shader_module(triangle_vert, sizeof(triangle_vert)),
+				.pName  = "main",
+			}, {
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+				.stage  = VK_SHADER_STAGE_FRAGMENT_BIT,
+				.module = create_shader_module(triangle_frag, sizeof(triangle_frag)),
+				.pName  = "main",
+			},
+		};
+
+		VkGraphicsPipelineCreateInfo pipe = {
+			.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+			.stageCount          = (uint32_t)shader_stages.size(),
+			.pStages             = shader_stages.data(),
+			.pVertexInputState   = &vertex_input,
+			.pInputAssemblyState = &input_assembly,
+			.pViewportState      = &viewport,
+			.pRasterizationState = &raster,
+			.pMultisampleState   = &multisample,
+			.pDepthStencilState  = &depth_stencil,
+			.pColorBlendState    = &blend,
+			.pDynamicState       = &dynamic,
+			.layout              = this->pipeline_layout,
+			.renderPass          = this->render_pass,
+		};
+		vkCreateGraphicsPipelines(vulkan_if->device, this->pipeline_cache, 1, &pipe, nullptr, &this->pipeline);
+
+		for(auto& shader_stage: shader_stages)
+			vkDestroyShaderModule(device, shader_stage.module, nullptr);
+	}
+
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		vulkan_if = vulkan;
 		fprintf(stderr, "volcano_init(): Initialization begun!\n");
@@ -224,5 +368,6 @@ namespace volcano {
 		vkCreatePipelineCache(vulkan->device, &pipeline_cache_info, nullptr, &this->pipeline_cache);
 
 		init_render_pass(VK_FORMAT_R8G8B8A8_UNORM);
+		init_pipeline();
 	}
 }
