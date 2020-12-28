@@ -20,9 +20,14 @@ namespace volcano {
 			uint32_t swapchain_mask;
 
 			VkPipelineCache pipeline_cache;
+			VkPipelineLayout pipeline_layout;
 
 			VkCommandPool cmd_pool[MAX_SYNC];
 			VkCommandBuffer cmd[MAX_SYNC];
+
+			VkDescriptorPool desc_pool;
+			VkDescriptorSetLayout set_layout;
+			VkDescriptorSet desc_set[MAX_SYNC];
 
 			struct buffer ubo[MAX_SYNC];
 
@@ -30,6 +35,7 @@ namespace volcano {
 			struct buffer create_buffer(const void *initial, size_t size, VkBufferUsageFlags usage);
 			void init_uniform_buffer();
 			void init_command();
+			void init_descriptor();
 
 		public:
 			void init(retro_hw_render_interface_vulkan *);

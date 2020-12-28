@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <vector>
+
 #include <loguru.hpp>
 
 namespace volcano {
@@ -96,6 +98,76 @@ namespace volcano {
 		}
 	}
 
+	void renderer::init_descriptor() {
+		VkDevice device = vulkan_if->device;
+
+		// Initialize descriptor pool
+		static const std::vector<VkDescriptorPoolSize> pool_sizes {
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, this->num_swapchain_images },
+		};
+
+		VkDescriptorPoolCreateInfo pool_info = {
+			.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+			.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+			.maxSets       = this->num_swapchain_images,
+			.poolSizeCount = (uint32_t)pool_sizes.size(),
+			.pPoolSizes    = pool_sizes.data(),
+		};
+		vkCreateDescriptorPool(device, &pool_info, nullptr, &this->desc_pool);
+
+		// Define descriptor set
+		VkDescriptorSetLayoutBinding binding = {
+			.binding            = 0,
+			.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount    = 1,
+			.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT,
+			.pImmutableSamplers = nullptr,
+		};
+
+		VkDescriptorSetLayoutCreateInfo set_layout_info = {
+			.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.bindingCount = 1,
+			.pBindings    = &binding,
+		};
+		vkCreateDescriptorSetLayout(device, &set_layout_info, nullptr, &this->set_layout);
+
+		VkDescriptorSetAllocateInfo alloc_info = {
+			.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+			.descriptorPool     = this->desc_pool,
+			.descriptorSetCount = 1,
+			.pSetLayouts        = &this->set_layout,
+		};
+
+		for(unsigned i = 0; i < this->num_swapchain_images; i++) {
+			vkAllocateDescriptorSets(device, &alloc_info, &this->desc_set[i]);
+
+			VkDescriptorBufferInfo buffer_info = {
+				.buffer = this->ubo[i].buffer,
+				.offset = 0,
+				.range  = 16 * sizeof(float),
+			};
+
+			VkWriteDescriptorSet write = {
+				.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet          = this->desc_set[i],
+				.dstBinding      = 0,
+				.descriptorCount = 1,
+				.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo     = &buffer_info,
+			};
+
+			vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
+		}
+
+		// Create pipeline-layout for descriptor set
+		VkPipelineLayoutCreateInfo layout_info = {
+			.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+			.setLayoutCount = 1,
+			.pSetLayouts    = &this->set_layout,
+		};
+		vkCreatePipelineLayout(device, &layout_info, nullptr, &this->pipeline_layout);
+	}
+
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		vulkan_if = vulkan;
 		fprintf(stderr, "volcano_init(): Initialization begun!\n");
@@ -116,6 +188,7 @@ namespace volcano {
 
 		init_uniform_buffer();
 		init_command();
+		init_descriptor();
 
 		VkPipelineCacheCreateInfo pipeline_cache_info = { VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
 		vkCreatePipelineCache(vulkan->device, &pipeline_cache_info, nullptr, &this->pipeline_cache);
