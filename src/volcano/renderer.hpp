@@ -36,6 +36,8 @@ namespace volcano {
 
 			struct buffer ubo[MAX_SYNC];
 
+			unsigned int index;
+
 			uint32_t find_memory_type_from_requirements(uint32_t device_requirements, uint32_t host_requirements);
 			struct buffer create_buffer(const void *initial, size_t size, VkBufferUsageFlags usage);
 			void init_uniform_buffer();
@@ -45,9 +47,11 @@ namespace volcano {
 			VkShaderModule create_shader_module(const uint32_t *data, size_t size);
 			void init_pipeline();
 			void init_swapchain();
+			void update_ubo();
 
 		public:
 			void init(retro_hw_render_interface_vulkan *);
+			void dispatch();
 	};
 }
 
