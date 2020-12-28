@@ -21,6 +21,9 @@ namespace volcano {
 
       VkPipelineCache pipeline_cache;
 
+      VkCommandPool cmd_pool[MAX_SYNC];
+      VkCommandBuffer cmd[MAX_SYNC];
+
       struct buffer ubo[MAX_SYNC];
       struct buffer vbo;
 
@@ -28,6 +31,7 @@ namespace volcano {
       struct buffer create_buffer(const void *initial, size_t size, VkBufferUsageFlags usage);
       void init_uniform_buffer();
       void init_vertex_buffer();
+      void init_command();
 
    public:
       void init(retro_hw_render_interface_vulkan*);

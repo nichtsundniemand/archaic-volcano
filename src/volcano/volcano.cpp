@@ -75,6 +75,26 @@ namespace volcano {
     this->vbo = create_buffer(data, sizeof(data), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
   }
 
+  void renderer::init_command() {
+    VkCommandPoolCreateInfo pool_info = {
+      .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+      .flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+      .queueFamilyIndex = vulkan_if->queue_index,
+    };
+
+    for (unsigned i = 0; i < this->num_swapchain_images; i++) {
+      vkCreateCommandPool(vulkan_if->device, &pool_info, nullptr, &this->cmd_pool[i]);
+
+      VkCommandBufferAllocateInfo info = {
+        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool        = this->cmd_pool[i],
+        .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1,
+      };
+      vkAllocateCommandBuffers(vulkan_if->device, &info, &this->cmd[i]);
+    }
+  }
+
   void renderer::init(retro_hw_render_interface_vulkan* vulkan) {
     vulkan_if = vulkan;
     fprintf(stderr, "volcano_init(): Initialization begun!\n");
@@ -96,6 +116,7 @@ namespace volcano {
 
     init_uniform_buffer();
     init_vertex_buffer();
+    init_command();
 
     VkPipelineCacheCreateInfo pipeline_cache_info = { VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO };
     vkCreatePipelineCache(vulkan->device, &pipeline_cache_info, nullptr, &this->pipeline_cache);
