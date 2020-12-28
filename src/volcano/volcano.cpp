@@ -2,8 +2,13 @@
 
 #include <vulkan/vulkan_symbol_wrapper.h>
 
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 
 namespace volcano {
   static retro_hw_render_interface_vulkan* vulkan_if;
@@ -447,5 +452,146 @@ namespace volcano {
     init_render_pass(VK_FORMAT_R8G8B8A8_UNORM);
     init_pipeline();
     init_swapchain();
+  }
+
+  void renderer::update_ubo(void) {
+    static unsigned frame;
+
+    glm::mat4 view = glm::rotate(glm::mat4(1.0f), frame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::rotate(view, glm::pi<float>() / 5, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    float *mvp = nullptr;
+    vkMapMemory(
+      vulkan_if->device, this->ubo[this->index].memory,
+      0, 16 * sizeof(float), 0, (void**)&mvp
+    );
+    memcpy(mvp, &view, sizeof(view));
+    vkUnmapMemory(vulkan_if->device, this->ubo[this->index].memory);
+
+    frame++;
+  }
+
+  void renderer::dispatch() {
+    vulkan_if->wait_sync_index(vulkan_if->handle);
+    this->index = vulkan_if->get_sync_index(vulkan_if->handle);
+
+    update_ubo();
+
+    VkCommandBuffer cmd = this->cmd[this->index];
+
+    VkCommandBufferBeginInfo begin_info = {
+      .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+      .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+    };
+    vkResetCommandBuffer(cmd, 0);
+    vkBeginCommandBuffer(cmd, &begin_info);
+
+    VkImageMemoryBarrier prepare_rendering = {
+      .sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+      .pNext               = nullptr,
+      .srcAccessMask       = 0,
+      .dstAccessMask       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
+      .oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED,
+      .newLayout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+      .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+      .image               = this->images[this->index].create_info.image,
+      .subresourceRange    = {
+        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount = 1,
+        .layerCount = 1,
+      }
+    };
+    vkCmdPipelineBarrier(cmd,
+      VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+      false, 
+      0, nullptr,
+      0, nullptr,
+      1, &prepare_rendering
+    );
+
+    VkClearValue clear_value = {
+      .color = {
+	.float32 = {
+	  0.8f,
+	  0.6f,
+	  0.2f,
+	  1.0f,
+	},
+      },
+    };
+
+    VkRenderPassBeginInfo rp_begin = {
+      .sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+      .pNext             = nullptr,
+      .renderPass        = this->render_pass,
+      .framebuffer       = this->framebuffers[this->index],
+      .renderArea = {
+        {    0,   0 },
+        { 1280, 720 },
+      },
+      .clearValueCount   = 1,
+      .pClearValues      = &clear_value,
+    };
+    vkCmdBeginRenderPass(cmd, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, this->pipeline);
+    vkCmdBindDescriptorSets(
+      cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+      this->pipeline_layout, 0,
+      1, &this->desc_set[this->index], 0, nullptr
+    );
+
+    VkViewport vp = {
+      .x        = 0.0f,
+      .y        = 0.0f,
+      .width    = 1280,
+      .height   = 720,
+      .minDepth = 0.0f,
+      .maxDepth = 1.0f,
+    };
+    vkCmdSetViewport(cmd, 0, 1, &vp);
+
+    VkRect2D scissor = {
+      {    0,   0 },
+      { 1280, 720 },
+    };
+    vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+    VkDeviceSize offset = 0;
+    vkCmdBindVertexBuffers(cmd, 0, 1, &this->vbo.buffer, &offset);
+
+    vkCmdDraw(cmd, 3, 1, 0, 0);
+
+    vkCmdEndRenderPass(cmd);
+
+    VkImageMemoryBarrier prepare_presentation = {
+      .sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+      .pNext               = nullptr,
+      .srcAccessMask       = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+      .dstAccessMask       = VK_ACCESS_SHADER_READ_BIT,
+      .oldLayout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+      .newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+      .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+      .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+      .image               = this->images[this->index].create_info.image,
+      .subresourceRange    = {
+        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        .levelCount = 1,
+        .layerCount = 1,
+      }
+    };
+    vkCmdPipelineBarrier(cmd,
+      VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+      false,
+      0, nullptr,
+      0, nullptr,
+      1, &prepare_presentation
+    );
+
+    vkEndCommandBuffer(cmd);
+
+    vulkan_if->set_image(vulkan_if->handle, &this->images[this->index], 0, nullptr, VK_QUEUE_FAMILY_IGNORED);
+    vulkan_if->set_command_buffers(vulkan_if->handle, 1, &this->cmd[this->index]);
   }
 }

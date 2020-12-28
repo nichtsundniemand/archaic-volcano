@@ -145,6 +145,8 @@ RETRO_API unsigned retro_get_region(void) {
 }
 
 RETRO_API void retro_run(void) {
+  renderer.dispatch();
+
   retro_callbacks.video(RETRO_HW_FRAME_BUFFER_VALID, WIDTH, HEIGHT, 0);
 }
 
