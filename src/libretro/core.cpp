@@ -1,12 +1,18 @@
 #include <libretro.h>
 
+#include <loguru.hpp>
+
 RETRO_API unsigned int retro_api_version() {
 	return 0;
 }
 
 RETRO_API void retro_set_environment(retro_environment_t) {}
 
-RETRO_API void retro_init() {}
+RETRO_API void retro_init() {
+	loguru::add_file("logs/volcano_debug.log", loguru::Append, loguru::Verbosity_INFO);
+	loguru::g_stderr_verbosity = loguru::Verbosity_ERROR;
+	LOG_F(INFO, "Logger initialized!");
+}
 
 RETRO_API void retro_deinit() {}
 
