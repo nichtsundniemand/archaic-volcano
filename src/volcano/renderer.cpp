@@ -2,9 +2,12 @@
 
 #include <vulkan/vulkan_symbol_wrapper.h>
 
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include <cmath>
 #include <cstdio>
@@ -457,15 +460,22 @@ namespace volcano {
 	void renderer::update_ubo(void) {
 		static unsigned frame;
 
-		glm::mat4 view = glm::rotate(glm::mat4(1.0f), frame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::rotate(view, glm::pi<float>() / 5, glm::vec3(1.0f, 0.0f, 0.0f));
+		float translate = 10.0f;
 
-		float *mvp = nullptr;
+		glm::mat4 projection = glm::perspective(glm::pi<float>() * 0.25f, 1.0f / 1.0f, 0.1f, 100.f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -translate));
+		view = glm::rotate(view, frame * 0.0031416926535f, glm::vec3(-1.0f, 0.0f, 0.0f));
+		view = glm::rotate(view, frame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
+
+		glm::mat4 mvp = projection * view * model;
+
+		float *memmap_mvp = nullptr;
 		vkMapMemory(
 			vulkan_if->device, this->ubo[this->index].memory,
-			0, sizeof(glm::mat4), 0, (void**)&mvp
+			0, sizeof(glm::mat4), 0, (void **)&memmap_mvp
 		);
-		memcpy(mvp, &view, sizeof(view));
+		memcpy(memmap_mvp, &mvp, sizeof(mvp));
 		vkUnmapMemory(vulkan_if->device, this->ubo[this->index].memory);
 
 		frame++;
