@@ -48,6 +48,8 @@ namespace volcano {
 
 			unsigned int index;
 
+			float cam_x, cam_y;
+
 			std::vector<mesh> meshes;
 
 			uint32_t find_memory_type_from_requirements(uint32_t device_requirements, uint32_t host_requirements);
@@ -69,6 +71,11 @@ namespace volcano {
 				const std::vector<graphics::vertex>& vertices,
 				const kepler::transform_reference& transform
 			);
+
+			void move_forward();
+			void move_backward();
+			void move_left();
+			void move_right();
 	};
 }
 
