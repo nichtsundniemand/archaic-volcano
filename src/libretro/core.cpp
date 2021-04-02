@@ -192,6 +192,40 @@ RETRO_API unsigned retro_get_region(void) {
 }
 
 RETRO_API void retro_run(void) {
+	{
+		LOG_SCOPE_F(INFO, "Poll Input");
+		retro_callbacks.input_poll();
+
+		short input_mask = retro_callbacks.input_state(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+
+		{
+			LOG_SCOPE_F(INFO, "Input mask: %d", input_mask);
+			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_B)) {
+				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_B");
+			}
+			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_UP)) {
+				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_UP");
+				renderer.move_forward();
+			}
+			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN)) {
+				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_DOWN");
+				renderer.move_backward();
+			}
+			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT)) {
+				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_LEFT");
+				renderer.move_left();
+			}
+			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT)) {
+				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_RIGHT");
+				renderer.move_right();
+			}
+			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_A)) {
+				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_A");
+			}
+		}
+		// dispatcher.do_stuff
+	}
+
 	renderer.dispatch();
 
 	retro_callbacks.video(RETRO_HW_FRAME_BUFFER_VALID, WIDTH, HEIGHT, 0);
