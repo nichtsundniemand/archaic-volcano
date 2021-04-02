@@ -5,6 +5,7 @@
 #include <loguru.hpp>
 
 #include <kepler/transform.hpp>
+#include "kraken/dispatcher.hpp"
 #include "volcano/graphics/meshes.hpp"
 #include "volcano/graphics/vertex.hpp"
 #include "volcano/mesh.hpp"
@@ -26,6 +27,8 @@ static struct retro_callbacks {
 	retro_input_poll_t input_poll;
 	retro_input_state_t input_state;
 } retro_callbacks;
+
+kraken::dispatcher dispatcher;
 
 static retro_hw_render_interface_vulkan *vulkan;
 volcano::renderer renderer;
