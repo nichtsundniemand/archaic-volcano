@@ -7,4 +7,6 @@ project(
 	],
 )
 
+loguru_dep = dependency('loguru')
+
 subdir('src')
