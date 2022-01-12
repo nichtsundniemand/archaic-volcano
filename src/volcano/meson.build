@@ -1,9 +1,11 @@
 libretro_dep = dependency('libretro')
+glm_dep = dependency('glm')
 
 volcano_lib = static_library(
 	'volcano',
 	'renderer.cpp',
 	dependencies: [
+		glm_dep,
 		libretro_dep,
 		loguru_dep,
 	],
