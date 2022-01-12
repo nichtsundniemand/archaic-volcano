@@ -8,13 +8,17 @@ project(
 )
 
 libretro_dep = dependency('libretro')
+loguru_dep = dependency('loguru')
 
 subdir('doc')
 
 retro_volcano = library(
 	'retro_volcano',
 	'libvolcano.cpp',
-	dependencies : libretro_dep,
+	dependencies : [
+		libretro_dep,
+		loguru_dep,
+	],
 	install : true
 )
 
