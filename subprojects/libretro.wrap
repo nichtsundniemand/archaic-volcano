@@ -1,0 +1,5 @@
+[wrap-git]
+url = https://github.com/libretro/libretro-common.git
+revision = HEAD
+
+patch_directory = libretro_overlay
