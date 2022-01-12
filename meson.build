@@ -19,6 +19,7 @@ retro_volcano = library(
 	dependencies : [
 		libretro_dep,
 		loguru_dep,
+		volcano_dep,
 	],
 	include_directories: src_include,
 	install : true
