@@ -15,4 +15,4 @@ In order to run this you need a vulkan-capable GPU-driver and the libretro-front
 
 In principle you could use any other frontend as well. I just went with RetroArch since it's pretty nice.
 
-To run, just build the project and execute `retroarch -L build/libretro_volcano.so`.
+To run, just execute `ninja -C build run`.
