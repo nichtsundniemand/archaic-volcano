@@ -5,6 +5,7 @@
 
 #include <libretro_vulkan.h>
 
+#include "camera.hpp"
 #include "graphics/vertex.hpp"
 #include <transform.hpp>
 
@@ -49,6 +50,7 @@ namespace volcano {
 			unsigned int index;
 
 			float cam_x, cam_y;
+			camera main_camera;
 
 			std::vector<mesh> meshes;
 
@@ -64,6 +66,8 @@ namespace volcano {
 			void update_ubo();
 
 		public:
+			renderer();
+
 			void init(retro_hw_render_interface_vulkan *);
 			void dispatch();
 
@@ -76,6 +80,8 @@ namespace volcano {
 			void move_backward();
 			void move_left();
 			void move_right();
+
+			const camera& get_camera();
 	};
 }
 

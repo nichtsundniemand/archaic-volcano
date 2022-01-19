@@ -540,6 +540,9 @@ namespace volcano {
 		}
 	}
 
+	renderer::renderer()
+	: main_camera(glm::pi<float>() * 0.25f, 1.0f / 1.0f, 0.1f, 100.f) {}
+
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		vulkan_if = vulkan;
 		fprintf(stderr, "volcano_init(): Initialization begun!\n");
@@ -827,5 +830,9 @@ namespace volcano {
 
 	void renderer::move_right() {
 		cam_x += 0.1f;
+	}
+
+	const camera& renderer::get_camera() {
+		return main_camera;
 	}
 }
