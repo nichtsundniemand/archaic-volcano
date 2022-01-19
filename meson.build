@@ -10,3 +10,10 @@ project(
 loguru_dep = dependency('loguru')
 
 subdir('src')
+
+retroarch_prog = find_program('retroarch')
+
+volcano_run = run_target(
+	'run',
+	command: [retroarch_prog, '-L', retro_volcano]
+)
