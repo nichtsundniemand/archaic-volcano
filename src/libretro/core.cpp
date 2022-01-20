@@ -1,7 +1,10 @@
 #include <libretro_vulkan.h>
 
+#include <vector>
+
 #include <loguru.hpp>
 
+#include "volcano/graphics/vertex.hpp"
 #include "volcano/mesh.hpp"
 #include "volcano/renderer.hpp"
 
@@ -90,6 +93,253 @@ RETRO_CALLCONV void retro_context_reset() {
 	);
 
 	renderer.init(vulkan);
+
+	// Create a simple colored triangle
+	// static const float data[] = {
+	//   -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // vec4 position, vec4 color
+	//   -0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+	//   +0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+	// };
+	// renderer.add_mesh(data, sizeof(data) / sizeof(float));
+
+	// Some other mesh
+	const float circle_radius = 0.75f;
+	const int circle_segments = 64;
+	std::vector<volcano::graphics::vertex> circle_data;
+	for(int i = 0; i < circle_segments; i++) {
+		// Center vertex
+		glm::vec3 p(0.0f, 0.0f, 0.0f);
+		circle_data.push_back({
+			.position = {0.0f, 0.0f, 0.0f},
+			.normal   = {0.0f, 0.0f, 0.0f},
+			.color    = {0.5f, 0.0f, 0.0f, 1.0f}
+		});
+
+		// Diameter vertices (first)
+		circle_data.push_back({
+			.position = {
+				sin(i * 2 * M_PI / circle_segments) * circle_radius,
+				cos(i * 2 * M_PI / circle_segments) * circle_radius,
+				0.03f * (i - (circle_segments >> 1))
+			},
+			.normal = {0.0f, 0.0f, 0.0f},
+			.color  = {0.5f, 0.0f, 0.1f * i, 1.0f}
+		});
+
+		// Position data (second)
+		circle_data.push_back({
+			.position = {
+				sin((i + 1) * 2 * M_PI / circle_segments) * circle_radius,
+				cos((i + 1) * 2 * M_PI / circle_segments) * circle_radius,
+				0.03f * (i + 1 - (circle_segments >> 1)),
+			},
+			.normal = {0.0f, 0.0f, 0.0f},
+			.color  = {0.5f, 0.0f, 0.1f * (i + 1), 1.0f}
+		});
+	}
+	// renderer.add_mesh(circle_data);
+
+	const float cube_length = 0.75f;
+	std::vector<volcano::graphics::vertex> cube_data;
+	// Back face
+	glm::vec3 back_normal(0.0f, 0.0f, -1.0f);
+	glm::vec4 back_color(0.5f, 1.0f, 1.0f, 1.0f);
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = back_normal,
+		.color = back_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = back_normal,
+		.color = back_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = back_normal,
+		.color = back_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = back_normal,
+		.color = back_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = back_normal,
+		.color = back_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = back_normal,
+		.color = back_color
+	});
+	// Front face
+	glm::vec3 front_normal(0.0f, 0.0f, 1.0f);
+	glm::vec4 front_color(1.0f, 0.5f, 1.0f, 1.0f);
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = front_normal,
+		.color = front_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = front_normal,
+		.color = front_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = front_normal,
+		.color = front_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = front_normal,
+		.color = front_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = front_normal,
+		.color = front_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = front_normal,
+		.color = front_color
+	});
+	// Left face
+	glm::vec3 left_normal(-1.0f, 0.0f, 0.0f);
+	glm::vec4 left_color(1.0f, 1.0f, 0.5f, 1.0f);
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = left_normal,
+		.color = left_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = left_normal,
+		.color = left_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = left_normal,
+		.color = left_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = left_normal,
+		.color = left_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = left_normal,
+		.color = left_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = left_normal,
+		.color = left_color
+	});
+	// Right face
+	glm::vec3 right_normal(1.0f, 0.0f, 0.0f);
+	glm::vec4 right_color(0.5f, 1.0f, 0.5f, 1.0f);
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = right_normal,
+		.color = right_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = right_normal,
+		.color = right_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = right_normal,
+		.color = right_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = right_normal,
+		.color = right_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = right_normal,
+		.color = right_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = right_normal,
+		.color = right_color
+	});
+	// Top face
+	glm::vec3 top_normal(0.0f, 1.0f, 0.0f);
+	glm::vec4 top_color(1.0f, 0.5f, 0.5f, 1.0f);
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = top_normal,
+		.color = top_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = top_normal,
+		.color = top_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = top_normal,
+		.color = top_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, cube_length / 2},
+		.normal = top_normal,
+		.color = top_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = top_normal,
+		.color = top_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, cube_length / 2, -cube_length / 2},
+		.normal = top_normal,
+		.color = top_color
+	});
+	// Bottom face
+	glm::vec3 bottom_normal(0.0f, -1.0f, 0.0f);
+	glm::vec4 bottom_color(0.5f, 0.5f, 1.0f, 1.0f);
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = bottom_normal,
+		.color = bottom_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = bottom_normal,
+		.color = bottom_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = bottom_normal,
+		.color = bottom_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, cube_length / 2},
+		.normal = bottom_normal,
+		.color = bottom_color
+	});
+	cube_data.push_back({
+		.position = {cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = bottom_normal,
+		.color = bottom_color
+	});
+	cube_data.push_back({
+		.position = {-cube_length / 2, -cube_length / 2, -cube_length / 2},
+		.normal = bottom_normal,
+		.color = bottom_color
+	});
+	renderer.add_mesh(cube_data);
 }
 
 RETRO_CALLCONV void retro_context_destroy() {
