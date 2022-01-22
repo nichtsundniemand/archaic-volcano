@@ -11,6 +11,7 @@ libretro_dep = dependency('libretro')
 loguru_dep = dependency('loguru')
 
 subdir('doc')
+subdir('src')
 
 retro_volcano = library(
 	'retro_volcano',
@@ -19,6 +20,7 @@ retro_volcano = library(
 		libretro_dep,
 		loguru_dep,
 	],
+	include_directories: src_include,
 	install : true
 )
 
