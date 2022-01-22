@@ -15,6 +15,7 @@ add_project_arguments(
 loguru_dep = dependency('loguru')
 
 subdir('doc')
+subdir('shaders')
 subdir('src')
 
 retroarch_prog = find_program('retroarch')
