@@ -8,3 +8,5 @@ project(
 )
 
 libretro_dep = dependency('libretro')
+
+subdir('src')
