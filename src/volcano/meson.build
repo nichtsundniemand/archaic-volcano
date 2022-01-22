@@ -6,6 +6,7 @@ volcano_lib = static_library(
 	dependencies: [
 		glm_dep,
 		libretro_dep,
+		loguru_dep,
 	],
 )
 
