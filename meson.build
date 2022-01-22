@@ -9,6 +9,7 @@ project(
 
 loguru_dep = dependency('loguru')
 
+subdir('doc')
 subdir('src')
 
 retroarch_prog = find_program('retroarch')

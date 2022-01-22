@@ -1,0 +1,5 @@
+[wrap-git]
+url = https://github.com/jothepro/doxygen-awesome-css.git
+revision = v1.6.1
+
+patch_directory = doxygen-awesome-css
