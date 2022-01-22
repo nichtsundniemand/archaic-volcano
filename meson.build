@@ -9,6 +9,8 @@ project(
 
 libretro_dep = dependency('libretro')
 
+subdir('doc')
+
 retro_volcano = library(
 	'retro_volcano',
 	'libvolcano.cpp',
