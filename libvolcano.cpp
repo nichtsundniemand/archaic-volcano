@@ -45,9 +45,10 @@ RETRO_API void retro_set_input_state(retro_input_state_t cb) {
   retro_callbacks.input_state = cb;
 }
 
-RETRO_API void retro_set_controller_port_device(unsigned port, unsigned device) {
-
-}
+RETRO_API void retro_set_controller_port_device(
+	[[maybe_unused]] unsigned port,
+	[[maybe_unused]] unsigned device
+) {}
 
 static const char* library_name = "Archaic Volcano";
 static const char* library_version = "v0.0.1";
@@ -61,13 +62,14 @@ RETRO_API void retro_get_system_info(retro_system_info* info) {
   info->block_extract    = false;
 }
 
-RETRO_API bool retro_load_game(const struct retro_game_info* game) {
+RETRO_API bool retro_load_game([[maybe_unused]] const struct retro_game_info* game) {
   return true;
 }
 
 RETRO_API bool retro_load_game_special(
-  unsigned game_type,
-  const struct retro_game_info *info, size_t num_info
+  [[maybe_unused]] unsigned game_type,
+  [[maybe_unused]] const struct retro_game_info *info,
+  [[maybe_unused]] size_t num_info
 ) {
   return false;
 }
@@ -89,23 +91,19 @@ RETRO_API size_t retro_serialize_size(void) {
   return 0;
 }
 
-RETRO_API void retro_reset(void) {
+RETRO_API void retro_reset(void) {}
 
-}
-
-RETRO_API void retro_unload_game(void) {
-
-}
+RETRO_API void retro_unload_game(void) {}
 
 RETRO_API unsigned retro_get_region(void) {
   return RETRO_REGION_PAL;
 }
 
-RETRO_API void* retro_get_memory_data(unsigned id) {
+RETRO_API void* retro_get_memory_data([[maybe_unused]] unsigned id) {
   return nullptr;
 }
 
-RETRO_API size_t retro_get_memory_size(unsigned id) {
+RETRO_API size_t retro_get_memory_size([[maybe_unused]] unsigned id) {
   return 0;
 }
 
@@ -129,22 +127,26 @@ RETRO_API void retro_run(void) {
   retro_callbacks.video(buffer, w, h, sizeof(unsigned short) * w);
 }
 
-RETRO_API bool retro_serialize(void *data, size_t size) {
+RETRO_API bool retro_serialize(
+  [[maybe_unused]] void *data,
+  [[maybe_unused]] size_t size
+) {
   return false;
 }
 
-RETRO_API bool retro_unserialize(const void *data, size_t size) {
+RETRO_API bool retro_unserialize(
+  [[maybe_unused]] const void *data,
+  [[maybe_unused]] size_t size
+) {
   return false;
 }
 
-RETRO_API void retro_cheat_reset(void) {
-	
-}
+RETRO_API void retro_cheat_reset(void) {}
 
-RETRO_API void retro_cheat_set(unsigned index, bool enabled, const char *code) {
+RETRO_API void retro_cheat_set(
+  [[maybe_unused]] unsigned index,
+  [[maybe_unused]] bool enabled,
+  [[maybe_unused]] const char *code
+) {}
 
-}
-
-RETRO_API void retro_deinit() {
-
-}
+RETRO_API void retro_deinit() {}
