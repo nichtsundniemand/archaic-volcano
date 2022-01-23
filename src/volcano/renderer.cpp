@@ -2,6 +2,8 @@
 
 #include <cstdio>
 
+#include <loguru.hpp>
+
 namespace volcano {
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		fprintf(stderr, "volcano_init(): Initialization begun!\n");
