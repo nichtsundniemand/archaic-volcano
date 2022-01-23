@@ -4,6 +4,8 @@
 #include <libretro_vulkan.h>
 
 #define MAX_SYNC 4
+#define WIDTH 1280
+#define HEIGHT 720
 
 namespace volcano {
 	struct buffer {
