@@ -1,7 +1,8 @@
 #include <libretro_vulkan.h>
-#include <vulkan/vulkan_symbol_wrapper.h>
 
 #include <loguru.hpp>
+
+#include "volcano/renderer.hpp"
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -20,6 +21,7 @@ static struct retro_callbacks {
 } retro_callbacks;
 
 static retro_hw_render_interface_vulkan *vulkan;
+volcano::renderer renderer;
 
 // Core basics
 RETRO_API unsigned int retro_api_version() {
@@ -86,9 +88,7 @@ RETRO_CALLCONV void retro_context_reset() {
 		vulkan->interface_version, vulkan->handle
 	);
 
-	vulkan_symbol_wrapper_init(vulkan->get_instance_proc_addr);
-	vulkan_symbol_wrapper_load_core_instance_symbols(vulkan->instance);
-	vulkan_symbol_wrapper_load_core_device_symbols(vulkan->device);
+	renderer.init(vulkan);
 }
 
 RETRO_CALLCONV void retro_context_destroy() {
