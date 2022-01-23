@@ -1,5 +1,17 @@
 #include <libretro.h>
 
+const int w = 1280;
+const int h = 720;
+static unsigned short buffer[w * h];
+
+static struct retro_callbacks {
+  retro_video_refresh_t video;
+  retro_audio_sample_t audio;
+  retro_audio_sample_batch_t audio_batch;
+  retro_input_poll_t input_poll;
+  retro_input_state_t input_state;
+} retro_callbacks;
+
 RETRO_API unsigned int retro_api_version () {
   return RETRO_API_VERSION;
 }
@@ -9,38 +21,28 @@ RETRO_API void retro_set_environment(retro_environment_t cb) {
   cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
 }
 
-const int w = 1280;
-const int h = 720;
-static unsigned short buffer[w * h];
-
 RETRO_API void retro_init() {
 
 }
 
-static retro_video_refresh_t video_cb;
-static retro_audio_sample_t audio_cb;
-static retro_audio_sample_batch_t audio_batch_cb;
-static retro_input_poll_t input_poll_cb;
-static retro_input_state_t input_state_cb;
-
 RETRO_API void retro_set_video_refresh(retro_video_refresh_t cb) {
-  video_cb = cb;
+  retro_callbacks.video = cb;
 }
 
 RETRO_API void retro_set_audio_sample(retro_audio_sample_t cb) {
-  audio_cb = cb;
+  retro_callbacks.audio = cb;
 }
 
 RETRO_API void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) {
-  audio_batch_cb = cb;
+  retro_callbacks.audio_batch = cb;
 }
 
 RETRO_API void retro_set_input_poll(retro_input_poll_t cb) {
-  input_poll_cb = cb;
+  retro_callbacks.input_poll = cb;
 }
 
 RETRO_API void retro_set_input_state(retro_input_state_t cb) {
-  input_state_cb = cb;
+  retro_callbacks.input_state = cb;
 }
 
 RETRO_API void retro_set_controller_port_device(unsigned port, unsigned device) {
@@ -120,7 +122,7 @@ RETRO_API void retro_run(void) {
     }
   }
 
-  video_cb(buffer, w, h, sizeof(unsigned short) * w);
+  retro_callbacks.video(buffer, w, h, sizeof(unsigned short) * w);
 }
 
 RETRO_API bool retro_serialize(void *data, size_t size) {
