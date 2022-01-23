@@ -353,8 +353,8 @@ namespace volcano {
         .imageType     = VK_IMAGE_TYPE_2D,
         .format        = VK_FORMAT_R8G8B8A8_UNORM,
         .extent        = {
-          .width  = 1280,
-          .height = 720,
+          .width  = WIDTH,
+          .height = HEIGHT,
           .depth  = 1,
         },
         .mipLevels     = 1,
@@ -414,8 +414,8 @@ namespace volcano {
         .renderPass      = this->render_pass,
         .attachmentCount = 1,
         .pAttachments    = &this->images[i].image_view,
-        .width           = 1280,
-        .height          = 720,
+        .width           = WIDTH,
+        .height          = HEIGHT,
         .layers          = 1,
       };
       vkCreateFramebuffer(device, &fb_info, nullptr, &this->framebuffers[i]);
@@ -528,7 +528,7 @@ namespace volcano {
       .framebuffer       = this->framebuffers[this->index],
       .renderArea = {
         {    0,   0 },
-        { 1280, 720 },
+        { WIDTH, HEIGHT },
       },
       .clearValueCount   = 1,
       .pClearValues      = &clear_value,
@@ -545,16 +545,16 @@ namespace volcano {
     VkViewport vp = {
       .x        = 0.0f,
       .y        = 0.0f,
-      .width    = 1280,
-      .height   = 720,
+      .width    = WIDTH,
+      .height   = HEIGHT,
       .minDepth = 0.0f,
       .maxDepth = 1.0f,
     };
     vkCmdSetViewport(cmd, 0, 1, &vp);
 
     VkRect2D scissor = {
-      {    0,   0 },
-      { 1280, 720 },
+      {     0,      0 },
+      { WIDTH, HEIGHT },
     };
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
