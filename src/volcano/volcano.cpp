@@ -293,13 +293,9 @@ namespace volcano {
       { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO },
     };
 
-    static const uint32_t triangle_vert[] =
-      #include "shaders/triangle.vert.inc"
-    ;
+    static const uint32_t triangle_vert[] = {0};
 
-    static const uint32_t triangle_frag[] =
-      #include "shaders/triangle.frag.inc"
-    ;
+    static const uint32_t triangle_frag[] = {0};
 
     shader_stages[0] = {
       .stage = VK_SHADER_STAGE_VERTEX_BIT,
