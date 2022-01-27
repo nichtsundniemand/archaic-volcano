@@ -3,7 +3,10 @@ glm_dep = dependency('glm')
 
 volcano_lib = static_library(
 	'volcano',
-	'renderer.cpp',
+	[
+		'mesh.cpp',
+		'renderer.cpp',
+	],
 	dependencies: [
 		glm_dep,
 		libretro_dep,
