@@ -91,17 +91,19 @@ RETRO_CALLCONV void retro_context_reset() {
 	vulkan_symbol_wrapper_load_core_device_symbols(vulkan->device);
 }
 
+RETRO_CALLCONV void retro_context_destroy() {
+	LOG_F(INFO, "Wow - really should've been doing that, huh?");
+}
+
 RETRO_API bool retro_load_game([[maybe_unused]] const struct retro_game_info *game) {
 	// Initialize vulkan-context
-	retro_hw_context_reset_t context_destroy = nullptr;
-
 	static struct retro_hw_render_callback hw_render = {
 		.context_type    = RETRO_HW_CONTEXT_VULKAN,
 		.context_reset   = &retro_context_reset,
 		.version_major   = VK_MAKE_VERSION(1, 0, 18),
 		.version_minor   = 0,
 		.cache_context   = true,
-		.context_destroy = context_destroy,
+		.context_destroy = &retro_context_destroy,
 	};
 	if(!retro_callbacks.env(RETRO_ENVIRONMENT_SET_HW_RENDER, &hw_render))
 		return false;
