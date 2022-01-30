@@ -29,12 +29,15 @@ namespace volcano {
 		struct buffer buffer;
 		VkDevice device = vulkan_if->device;
 
+		LOG_SCOPE_FUNCTION(INFO);
+
 		VkBufferCreateInfo info = {
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
 			.size  = size,
 			.usage = usage,
 		};
 		vkCreateBuffer(device, &info, nullptr, &buffer.buffer);
+		LOG_F(INFO, "Created buffer with size %ld!", size);
 
 		VkMemoryRequirements mem_reqs;
 		vkGetBufferMemoryRequirements(device, buffer.buffer, &mem_reqs);
@@ -50,12 +53,15 @@ namespace volcano {
 
 		vkAllocateMemory(device, &alloc, nullptr, &buffer.memory);
 		vkBindBufferMemory(device, buffer.buffer, buffer.memory, 0);
+		LOG_F(INFO, "Allocated device memory with size %ld!", mem_reqs.size);
 
 		if(initial) {
 			void *ptr;
 			vkMapMemory(device, buffer.memory, 0, size, 0, &ptr);
 			memcpy(ptr, initial, size);
 			vkUnmapMemory(device, buffer.memory);
+
+			LOG_F(INFO, "Copied initial memory-contents into buffer!");
 		}
 
 		return buffer;
