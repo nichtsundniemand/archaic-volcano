@@ -6,6 +6,7 @@
 #include <libretro_vulkan.h>
 
 #include "graphics/vertex.hpp"
+#include <transform.hpp>
 
 #define MAX_SYNC 4
 #define WIDTH 1280
@@ -63,7 +64,10 @@ namespace volcano {
 			void init(retro_hw_render_interface_vulkan *);
 			void dispatch();
 
-			void add_mesh(const std::vector<graphics::vertex>& vertices);
+			void add_mesh(
+				const std::vector<graphics::vertex>& vertices,
+				const kepler::transform_reference& transform
+			);
 	};
 }
 

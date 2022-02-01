@@ -719,7 +719,10 @@ namespace volcano {
 		vulkan_if->set_command_buffers(vulkan_if->handle, 1, &this->cmd[this->index]);
 	}
 
-	void renderer::add_mesh(const std::vector<graphics::vertex>& vertices) {
+	void renderer::add_mesh(
+		const std::vector<graphics::vertex>& vertices,
+		const kepler::transform_reference& transform
+	) {
 		LOG_F(MAX, "Add new mesh (size=%ld)", vertices.size());
 
 		auto vbo = create_buffer(
@@ -727,6 +730,6 @@ namespace volcano {
 		);
 		LOG_F(MAX, "Buffer created (vbo.buffer=%d)", vbo.buffer);
 
-		meshes.push_back(mesh(vbo, vertices.size()));
+		meshes.push_back(mesh(vbo, vertices.size(), transform));
 	}
 }
