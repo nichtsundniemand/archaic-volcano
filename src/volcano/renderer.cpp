@@ -702,6 +702,12 @@ namespace volcano {
 
 		VkDeviceSize offset = 0;
 		for(mesh& cur_mesh: meshes) {
+			vkCmdBindDescriptorSets(
+				cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+				this->pipeline_layout, 1,
+				1, &cur_mesh.get_descriptor_set(index), 0, nullptr
+			);
+
 			vkCmdBindVertexBuffers(cmd, 0, 1, cur_mesh.get_buffer(), &offset);
 			vkCmdDraw(cmd, cur_mesh.get_size(), 1, 0, 0);
 			LOG_F(MAX, "Added draw-call for buffer %p with %d vertices", (void *)cur_mesh.get_buffer(), cur_mesh.get_size());
