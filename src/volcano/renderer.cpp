@@ -184,11 +184,15 @@ namespace volcano {
 			vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
 		}
 
-		// Create pipeline-layout for descriptor set
+		// Create pipeline-layout for descriptor sets
+		static const std::vector<VkDescriptorSetLayout> set_layouts {
+			this->set_layout, this->set_layout_model,
+		};
+
 		VkPipelineLayoutCreateInfo layout_info = {
 			.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-			.setLayoutCount = 1,
-			.pSetLayouts    = &this->set_layout,
+			.setLayoutCount = (uint32_t)set_layouts.size(),
+			.pSetLayouts    = set_layouts.data(),
 		};
 		vkCreatePipelineLayout(device, &layout_info, nullptr, &this->pipeline_layout);
 	}
