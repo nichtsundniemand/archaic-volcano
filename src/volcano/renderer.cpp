@@ -112,13 +112,13 @@ namespace volcano {
 
 		// Initialize descriptor pool
 		static const std::vector<VkDescriptorPoolSize> pool_sizes {
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, this->num_swapchain_images },
+			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024 },
 		};
 
 		VkDescriptorPoolCreateInfo pool_info = {
 			.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-			.maxSets       = this->num_swapchain_images,
+			.maxSets       = 256,
 			.poolSizeCount = (uint32_t)pool_sizes.size(),
 			.pPoolSizes    = pool_sizes.data(),
 		};
