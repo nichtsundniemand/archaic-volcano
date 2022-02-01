@@ -5,6 +5,7 @@ retro_volcano = library(
 	'core.cpp',
 	dependencies : [
 		glm_dep,
+		kepler_dep,
 		libretro_dep,
 		loguru_dep,
 		volcano_dep,

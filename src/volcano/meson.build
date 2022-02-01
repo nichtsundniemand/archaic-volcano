@@ -10,6 +10,7 @@ volcano_lib = static_library(
 	],
 	dependencies: [
 		glm_dep,
+		kepler_dep,
 		libretro_dep,
 		loguru_dep,
 		shader_dep,
