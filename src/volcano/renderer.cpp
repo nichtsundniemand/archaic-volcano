@@ -745,11 +745,51 @@ namespace volcano {
 	) {
 		LOG_F(MAX, "Add new mesh (size=%ld)", vertices.size());
 
+		// Create the VkDescriptorSet for attaching this UBO to the shader
+		VkDescriptorSetAllocateInfo alloc_info_model = {
+			.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+			.descriptorPool     = this->desc_pool,
+			.descriptorSetCount = 1,
+			.pSetLayouts        = &this->set_layout_model,
+		};
+
+		glm::mat4 model_transform = glm::mat4(1.0f);
+
+		// Allocate Per-Model descriptor-set and backing buffers (double buffered)
+		std::array<struct buffer, MAX_SYNC> uniform_buffers;
+		std::array<VkDescriptorSet, MAX_SYNC> descriptor_sets;
+		for(unsigned int i = 0; i < descriptor_sets.size(); i++) {
+			// Create the backing-buffer for the model-transform's UBO
+			uniform_buffers[i] = create_buffer(
+				&model_transform, sizeof(glm::mat4),
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+			);
+
+			// Allocate a new descriptor set using the model set-layout of the current pipeline
+			vkAllocateDescriptorSets(vulkan_if->device, &alloc_info_model, &descriptor_sets[i]);
+
+			VkDescriptorBufferInfo buffer_info = {
+				.buffer = uniform_buffers[i].buffer,
+				.offset = 0,
+				.range  = sizeof(glm::mat4),
+			};
+
+			VkWriteDescriptorSet write = {
+				.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet          = descriptor_sets[i],
+				.dstBinding      = 0,
+				.descriptorCount = 1,
+				.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo     = &buffer_info,
+			};
+			vkUpdateDescriptorSets(vulkan_if->device, 1, &write, 0, nullptr);
+		}
+
 		auto vbo = create_buffer(
 			vertices.data(), vertices.size() * sizeof(graphics::vertex), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT
 		);
 		LOG_F(MAX, "Buffer created (vbo.buffer=%d)", vbo.buffer);
 
-		meshes.push_back(mesh(vbo, vertices.size(), transform));
+		meshes.push_back(mesh(descriptor_sets, uniform_buffers, vbo, vertices.size(), transform));
 	}
 }
