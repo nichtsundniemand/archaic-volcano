@@ -13,9 +13,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
    mat4 MV;
 };
 
+layout(std140, set = 1, binding = 0) uniform MeshInfo
+{
+   mat4 model_transform;
+};
+
 void main()
 {
-   gl_Position = MVP * Position;
+   gl_Position = MVP * model_transform * Position;
    vColor = Color;
 
    vec4 transformedNormal = transpose(inverse(MV)) * vec4(Normal, 0);
