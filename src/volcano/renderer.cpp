@@ -124,7 +124,7 @@ namespace volcano {
 		};
 		vkCreateDescriptorPool(device, &pool_info, nullptr, &this->desc_pool);
 
-		// Define descriptor set
+		// Define per-frame descriptor set
 		VkDescriptorSetLayoutBinding binding = {
 			.binding            = 0,
 			.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -146,6 +146,22 @@ namespace volcano {
 			.descriptorSetCount = 1,
 			.pSetLayouts        = &this->set_layout,
 		};
+
+		// Define per-model descriptor set
+		VkDescriptorSetLayoutBinding binding_model = {
+			.binding            = 0,
+			.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount    = 1,
+			.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT,
+			.pImmutableSamplers = nullptr,
+		};
+
+		VkDescriptorSetLayoutCreateInfo set_layout_info_model = {
+			.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.bindingCount = 1,
+			.pBindings    = &binding_model,
+		};
+		vkCreateDescriptorSetLayout(device, &set_layout_info_model, nullptr, &this->set_layout_model);
 
 		for(unsigned i = 0; i < this->num_swapchain_images; i++) {
 			vkAllocateDescriptorSets(device, &alloc_info, &this->desc_set[i]);

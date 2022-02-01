@@ -42,6 +42,7 @@ namespace volcano {
 			VkDescriptorPool desc_pool;
 			VkDescriptorSetLayout set_layout;
 			VkDescriptorSet desc_set[MAX_SYNC];
+			VkDescriptorSetLayout set_layout_model;
 
 			struct buffer ubo[MAX_SYNC];
 
