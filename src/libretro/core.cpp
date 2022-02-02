@@ -4,9 +4,11 @@
 
 #include <loguru.hpp>
 
+#include <kepler/transform.hpp>
 #include "volcano/graphics/meshes.hpp"
 #include "volcano/graphics/vertex.hpp"
 #include "volcano/mesh.hpp"
+#include "volcano/mesh_loader.hpp"
 #include "volcano/renderer.hpp"
 
 #define WIDTH 1280
@@ -82,6 +84,8 @@ RETRO_API void retro_set_controller_port_device(
 ) {}
 
 // Core runtime stuff
+kepler::transform table_transform, chair_transform;
+
 RETRO_CALLCONV void retro_context_reset() {
 	if(!retro_callbacks.env(RETRO_ENVIRONMENT_GET_HW_RENDER_INTERFACE, (void **)&vulkan) || !vulkan) {
 		LOG_F(FATAL, "Could not fetch HW-render interface from frontend!");
@@ -95,8 +99,36 @@ RETRO_CALLCONV void retro_context_reset() {
 
 	renderer.init(vulkan);
 
-	auto grid = volcano::graphics::make_linegrid(7, 5);
+	auto grid = volcano::graphics::make_grid(7, 7);
 	renderer.add_mesh(grid);
+
+	volcano::mesh_loader table_loader(
+		"data/meshes/test_house.bin",
+		{
+			.buffer_size  = 11460,
+			.vertex_start = 0,
+			.vertex_count = 390,
+			.normal_start = 5680,
+			.normal_count = 390,
+			.index_start  = 9360,
+			.index_count  = 1050,
+		}
+	);
+	renderer.add_mesh(table_loader.vertices(), table_transform);
+
+	volcano::mesh_loader chair_loader(
+		"data/meshes/test_chair.bin",
+		{
+			.buffer_size  = 4632,
+			.vertex_start = 0,
+			.vertex_count = 170,
+			.normal_start = 2040,
+			.normal_count = 170,
+			.index_start  = 4080,
+			.index_count  = 276,
+		}
+	);
+	renderer.add_mesh(chair_loader.vertices(), chair_transform);
 }
 
 RETRO_CALLCONV void retro_context_destroy() {
