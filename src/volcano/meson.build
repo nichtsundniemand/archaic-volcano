@@ -6,6 +6,7 @@ volcano_lib = static_library(
 	[
 		'graphics/meshes.cpp',
 		'mesh.cpp',
+		'mesh_loader.cpp',
 		'renderer.cpp',
 	],
 	dependencies: [
