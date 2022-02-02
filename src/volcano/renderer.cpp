@@ -460,13 +460,13 @@ namespace volcano {
 	void renderer::update_ubo(void) {
 		static unsigned frame;
 
-		float translate = 10.0f;
+		float translate = 20.0f;
 
 		glm::mat4 projection = glm::perspective(-glm::pi<float>() * 0.25f, -1.0f / 1.0f, 0.1f, 100.f);
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -translate));
-		view = glm::rotate(view, frame * 0.0031416926535f, glm::vec3(-1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, frame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, -translate));
+		view = glm::rotate(view, -60 * 0.0031416926535f, glm::vec3(-1.0f, 0.0f, 0.0f));
+		view = glm::rotate(view, 50 * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.3f));
 
 		glm::mat4 mvp = projection * view * model;
 
