@@ -1,6 +1,8 @@
 #ifndef RENDERER_HPP
   #define RENDERER_HPP
 
+#include <vector>
+
 #include <libretro_vulkan.h>
 
 #include "graphics/vertex.hpp"
@@ -14,6 +16,8 @@ namespace volcano {
 		VkBuffer buffer;
 		VkDeviceMemory memory;
 	};
+
+	class mesh;
 
 	class renderer {
 		private:
@@ -42,6 +46,8 @@ namespace volcano {
 
 			unsigned int index;
 
+			std::vector<mesh> meshes;
+
 			uint32_t find_memory_type_from_requirements(uint32_t device_requirements, uint32_t host_requirements);
 			struct buffer create_buffer(const void *initial, size_t size, VkBufferUsageFlags usage);
 			void init_uniform_buffer();
@@ -56,6 +62,8 @@ namespace volcano {
 		public:
 			void init(retro_hw_render_interface_vulkan *);
 			void dispatch();
+
+			void add_mesh(const std::vector<graphics::vertex>& vertices);
 	};
 }
 

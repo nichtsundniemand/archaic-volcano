@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include "mesh.hpp"
 
 #include <vulkan/vulkan_symbol_wrapper.h>
 
@@ -574,6 +575,13 @@ namespace volcano {
 
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+		VkDeviceSize offset = 0;
+		for(mesh& cur_mesh: meshes) {
+			vkCmdBindVertexBuffers(cmd, 0, 1, cur_mesh.get_buffer(), &offset);
+			vkCmdDraw(cmd, cur_mesh.get_size(), 1, 0, 0);
+			LOG_F(MAX, "Added draw-call for buffer %p with %d vertices", (void *)cur_mesh.get_buffer(), cur_mesh.get_size());
+		}
+
 		vkCmdEndRenderPass(cmd);
 
 		VkImageMemoryBarrier prepare_presentation = {
@@ -604,5 +612,16 @@ namespace volcano {
 
 		vulkan_if->set_image(vulkan_if->handle, &this->images[this->index], 0, nullptr, VK_QUEUE_FAMILY_IGNORED);
 		vulkan_if->set_command_buffers(vulkan_if->handle, 1, &this->cmd[this->index]);
+	}
+
+	void renderer::add_mesh(const std::vector<graphics::vertex>& vertices) {
+		LOG_F(MAX, "Add new mesh (size=%ld)", vertices.size());
+
+		auto vbo = create_buffer(
+			vertices.data(), vertices.size() * sizeof(graphics::vertex), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT
+		);
+		LOG_F(MAX, "Buffer created (vbo.buffer=%d)", vbo.buffer);
+
+		meshes.push_back(mesh(vbo, vertices.size()));
 	}
 }
