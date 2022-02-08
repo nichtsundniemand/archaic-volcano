@@ -27,6 +27,14 @@ RETRO_API unsigned int retro_api_version() {
 	return RETRO_API_VERSION;
 }
 
+RETRO_API void retro_get_system_info(retro_system_info *info) {
+	info->library_name     = library_name;
+	info->library_version  = library_version;
+	info->valid_extensions = valid_extensions;
+	info->need_fullpath    = false;
+	info->block_extract    = false;
+}
+
 RETRO_API void retro_set_environment(retro_environment_t cb) {
 	bool no_rom = true;
 	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
@@ -64,14 +72,6 @@ RETRO_API void retro_set_controller_port_device(
 	[[maybe_unused]] unsigned port,
 	[[maybe_unused]] unsigned device
 ) {}
-
-RETRO_API void retro_get_system_info(retro_system_info *info) {
-	info->library_name     = library_name;
-	info->library_version  = library_version;
-	info->valid_extensions = valid_extensions;
-	info->need_fullpath    = false;
-	info->block_extract    = false;
-}
 
 // Core runtime stuff
 RETRO_API bool retro_load_game([[maybe_unused]] const struct retro_game_info *game) {
