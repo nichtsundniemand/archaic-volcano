@@ -6,6 +6,7 @@ retro_volcano = library(
 	dependencies : [
 		libretro_dep,
 		loguru_dep,
+		volcano_dep,
 	],
 	install : true
 )
