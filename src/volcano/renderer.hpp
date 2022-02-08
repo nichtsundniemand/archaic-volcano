@@ -3,6 +3,8 @@
 
 #include <libretro_vulkan.h>
 
+#include "graphics/vertex.hpp"
+
 #define MAX_SYNC 4
 #define WIDTH 1280
 #define HEIGHT 720

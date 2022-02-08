@@ -229,19 +229,24 @@ namespace volcano {
 			{
 				.location = 0,
 				.binding  = 0,
-				.format   = VK_FORMAT_R32G32B32A32_SFLOAT,
-				.offset   = 0,
+				.format   = VK_FORMAT_R32G32B32_SFLOAT,
+				.offset   = offsetof(graphics::vertex, position),
 			}, {
 				.location = 1,
 				.binding  = 0,
 				.format   = VK_FORMAT_R32G32B32A32_SFLOAT,
-				.offset   = 4 * sizeof(float),
+				.offset   = offsetof(graphics::vertex, color),
+			}, {
+				.location = 2,
+				.binding  = 0,
+				.format   = VK_FORMAT_R32G32B32_SFLOAT,
+				.offset   = offsetof(graphics::vertex, normal),
 			},
 		};
 
 		VkVertexInputBindingDescription binding = {
 			.binding   = 0,
-			.stride    = sizeof(float) * 8,
+			.stride    = sizeof(graphics::vertex),
 			.inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
 		};
 
