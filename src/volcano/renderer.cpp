@@ -570,6 +570,11 @@ namespace volcano {
 
 		vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+		VkDeviceSize offset = 0;
+		vkCmdBindVertexBuffers(cmd, 0, 1, &this->vbo.buffer, &offset);
+
+		vkCmdDraw(cmd, 3, 1, 0, 0);
+
 		vkCmdEndRenderPass(cmd);
 
 		VkImageMemoryBarrier prepare_presentation = {
