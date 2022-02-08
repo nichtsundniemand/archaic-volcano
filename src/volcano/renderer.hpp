@@ -37,12 +37,14 @@ namespace volcano {
 			VkDescriptorSet desc_set[MAX_SYNC];
 
 			struct buffer ubo[MAX_SYNC];
+			struct buffer vbo;
 
 			unsigned int index;
 
 			uint32_t find_memory_type_from_requirements(uint32_t device_requirements, uint32_t host_requirements);
 			struct buffer create_buffer(const void *initial, size_t size, VkBufferUsageFlags usage);
 			void init_uniform_buffer();
+			void init_vertex_buffer();
 			void init_command();
 			void init_descriptor();
 			void init_render_pass(VkFormat format);

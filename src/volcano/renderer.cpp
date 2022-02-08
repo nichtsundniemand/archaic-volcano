@@ -81,6 +81,16 @@ namespace volcano {
 		}
 	}
 
+	void renderer::init_vertex_buffer() {
+		// Create a simple colored triangle
+		static const float data[] = {
+			-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // vec4 position, vec4 color
+			-0.5f, +0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			+0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+		};
+		this->vbo = create_buffer(data, sizeof(data), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	}
+
 	void renderer::init_command() {
 		VkCommandPoolCreateInfo pool_info = {
 			.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -443,6 +453,7 @@ namespace volcano {
 		this->num_swapchain_images = num_images;
 
 		init_uniform_buffer();
+		init_vertex_buffer();
 		init_command();
 		init_descriptor();
 
