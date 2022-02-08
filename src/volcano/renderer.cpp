@@ -81,7 +81,7 @@ namespace volcano {
 	void renderer::init_uniform_buffer() {
 		for(unsigned i = 0; i < this->num_swapchain_images; i++) {
 			this->ubo[i] = create_buffer(
-				nullptr, sizeof(glm::mat4),
+				nullptr, 2 * sizeof(glm::mat4),
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
 			);
 		}
