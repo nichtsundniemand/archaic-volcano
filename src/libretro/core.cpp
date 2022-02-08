@@ -2,6 +2,7 @@
 
 #include <loguru.hpp>
 
+#include "volcano/mesh.hpp"
 #include "volcano/renderer.hpp"
 
 #define WIDTH 1280
