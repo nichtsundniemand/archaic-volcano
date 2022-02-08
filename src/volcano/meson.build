@@ -8,6 +8,7 @@ volcano_lib = static_library(
 		glm_dep,
 		libretro_dep,
 		loguru_dep,
+		shader_dep,
 	],
 )
 
