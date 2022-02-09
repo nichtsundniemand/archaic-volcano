@@ -7,6 +7,11 @@ project(
 	],
 )
 
+add_project_arguments(
+	'-Wno-missing-field-initializers',
+	language: 'cpp'
+)
+
 loguru_dep = dependency('loguru')
 
 subdir('doc')
