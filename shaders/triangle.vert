@@ -9,8 +9,8 @@ layout(location = 2) out vec3 vertPos;
 
 layout(std140, set = 0, binding = 0) uniform UBO
 {
-   mat4 MVP;
-   mat4 MV;
+   mat4 clip;
+   mat4 model;
 };
 
 layout(std140, set = 1, binding = 0) uniform MeshInfo
@@ -20,11 +20,11 @@ layout(std140, set = 1, binding = 0) uniform MeshInfo
 
 void main()
 {
-   gl_Position = MVP * model_transform * Position;
+   gl_Position = clip * model_transform * Position;
    vColor = Color;
 
-   vec4 transformedNormal = transpose(inverse(MV)) * vec4(Normal, 0);
+   vec4 transformedNormal = transpose(inverse(model)) * vec4(Normal, 0);
    worldNormal = transformedNormal.xyz;
 
-   vertPos = (MV * Position).xyz;
+   vertPos = (model * Position).xyz;
 }

@@ -576,21 +576,17 @@ namespace volcano {
 	void renderer::update_ubo(void) {
 		static unsigned frame;
 
-		float translate_x = cam_x;
-		float translate_z = 20.0f + cam_y;
+		main_camera.set_eye(glm::vec3(cam_x, 2.0f, 20.0f + cam_y));
+		main_camera.set_target(glm::vec3(0, 0, 0));
+		main_camera.update_matrix();
 
-		glm::mat4 projection = glm::perspective(-glm::pi<float>() * 0.25f, -1.0f / 1.0f, 0.1f, 100.f);
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(translate_x, 0.0f, -translate_z));
-		view = glm::rotate(view, -60 * 0.0031416926535f, glm::vec3(-1.0f, 0.0f, 0.0f));
-		view = glm::rotate(view, 50 * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.3f));
-
-		glm::mat4 mv  = view * model;
-		glm::mat4 mvp = projection * mv;
+		model = glm::rotate(model, frame * 0.0031416926535f, glm::vec3(-1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, frame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		const std::vector<glm::mat4> ubo_matrices = {
-			mvp,
-			mv,
+			main_camera.get_matrix(),
+			model,
 		};
 
 		float *memmap_mvp = nullptr;
