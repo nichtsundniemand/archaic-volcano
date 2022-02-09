@@ -597,6 +597,19 @@ namespace volcano {
 		memcpy(memmap_mvp, ubo_matrices.data(), ubo_matrices.size() * sizeof(glm::mat4));
 		vkUnmapMemory(vulkan_if->device, this->ubo[this->index].memory);
 
+		for(auto& cur_mesh: meshes) {
+			if(cur_mesh.get_transform(index).try_update()) {
+				glm::mat4 chair_model = cur_mesh.get_transform(index).get_model_matrix();
+				float *memmap_chair_model = nullptr;
+				vkMapMemory(
+					vulkan_if->device, cur_mesh.get_uniform(index).memory,
+					0, sizeof(glm::mat4), 0, (void **)&memmap_chair_model
+				);
+				memcpy(memmap_chair_model, &chair_model, sizeof(glm::mat4));
+				vkUnmapMemory(vulkan_if->device, cur_mesh.get_uniform(index).memory);
+			}
+		}
+
 		frame++;
 	}
 
