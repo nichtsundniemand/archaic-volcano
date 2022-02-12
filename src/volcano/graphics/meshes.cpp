@@ -7,6 +7,79 @@
 
 namespace volcano {
 	namespace graphics {
+		std::vector<vertex> make_lineprism(std::vector<glm::vec3> shape, float height) {
+			std::vector<vertex> vertices;
+
+			std::random_device rd;
+			std::default_random_engine randomizer(rd());
+			std::uniform_real_distribution<> dist(0.3, 2);
+
+			glm::vec3 shift(0, height, 0);
+			glm::vec3 normal(0, 0, 0);
+			glm::vec4 color(dist(randomizer), dist(randomizer), dist(randomizer), 1);
+
+			for(unsigned int i = 0; i < shape.size(); i++) {
+				vertices.push_back({
+					shape[i],
+					normal,
+					color,
+				});
+				vertices.push_back({
+					shape[(i + 1) % shape.size()],
+					normal,
+					color,
+				});
+
+				vertices.push_back({
+					shape[i] + shift,
+					normal,
+					color,
+				});
+				vertices.push_back({
+					shape[(i + 1) % shape.size()] + shift,
+					normal,
+					color,
+				});
+
+				vertices.push_back({
+					shape[i],
+					normal,
+					color,
+				});
+				vertices.push_back({
+					shape[i] + shift,
+					normal,
+					color,
+				});
+			}
+
+			return vertices;
+		}
+
+		std::vector<vertex> make_linecube() {
+			std::vector<glm::vec3> square {
+				{-0.5, 0, -0.5},
+				{-0.5, 0,  0.5},
+				{ 0.5, 0,  0.5},
+				{ 0.5, 0, -0.5},
+			};
+
+			return make_lineprism(square, 1);
+		}
+
+		std::vector<vertex> make_linecylinder(unsigned int segments) {
+			std::vector<glm::vec3> circle;
+			for(unsigned int i = 0; i < segments; i++) {
+				circle.push_back({
+					0.5 * cos(2 * i * M_PI / segments),
+					0,
+					0.5 * sin(2 * i * M_PI / segments)
+				});
+			}
+
+			return make_lineprism(circle, 1);
+		}
+
 		std::vector<vertex> make_grid(
 			const unsigned int rows,
 			const unsigned int cols

@@ -7,6 +7,9 @@
 
 namespace volcano {
 	namespace graphics {
+		std::vector<vertex> make_linecube();
+		std::vector<vertex> make_linecylinder(unsigned int segments);
+
 		std::vector<vertex> make_grid(
 			const unsigned int rows,
 			const unsigned int cols
