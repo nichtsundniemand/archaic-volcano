@@ -84,6 +84,7 @@ RETRO_API void retro_set_controller_port_device(
 ) {}
 
 // Core runtime stuff
+kepler::transform grid_transform;
 kepler::transform table_transform, chair_transform;
 
 RETRO_CALLCONV void retro_context_reset() {
@@ -100,7 +101,7 @@ RETRO_CALLCONV void retro_context_reset() {
 	renderer.init(vulkan);
 
 	auto grid = volcano::graphics::make_grid(7, 7);
-	renderer.add_mesh(grid);
+	renderer.add_mesh(grid, grid_transform);
 
 	volcano::mesh_loader table_loader(
 		"data/meshes/test_house.bin",
