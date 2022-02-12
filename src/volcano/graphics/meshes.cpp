@@ -56,6 +56,71 @@ namespace volcano {
 			return vertices;
 		}
 
+		std::vector<glm::vec3> triangulate_quad(std::vector<glm::vec3> quad) {
+			return std::vector<glm::vec3> {
+				quad[0], quad[1], quad[3], quad[3], quad[1], quad[2]
+			};
+		}
+
+		std::vector<vertex> make_cube() {
+			std::vector<glm::vec3> points;
+
+			std::vector<std::vector<glm::vec3>> faces {
+				// left face
+				triangulate_quad({
+					{-0.5, -0.5, -0.5},
+					{-0.5, -0.5,  0.5},
+					{-0.5,  0.5,  0.5},
+					{-0.5,  0.5, -0.5},
+				}),
+				// right face
+				triangulate_quad({
+					{ 0.5, -0.5, -0.5},
+					{ 0.5,  0.5, -0.5},
+					{ 0.5,  0.5,  0.5},
+					{ 0.5, -0.5,  0.5},
+				}),
+				// bottom face
+				triangulate_quad({
+					{-0.5, -0.5, -0.5},
+					{ 0.5, -0.5, -0.5},
+					{ 0.5, -0.5,  0.5},
+					{-0.5, -0.5,  0.5},
+				}),
+				// top face
+				triangulate_quad({
+					{-0.5,  0.5, -0.5},
+					{-0.5,  0.5,  0.5},
+					{ 0.5,  0.5,  0.5},
+					{ 0.5,  0.5, -0.5},
+				}),
+				// back face
+				triangulate_quad({
+					{-0.5, -0.5, -0.5},
+					{-0.5,  0.5, -0.5},
+					{ 0.5,  0.5, -0.5},
+					{ 0.5, -0.5, -0.5},
+				}),
+				// front face
+				triangulate_quad({
+					{-0.5, -0.5,  0.5},
+					{ 0.5, -0.5,  0.5},
+					{ 0.5,  0.5,  0.5},
+					{-0.5,  0.5,  0.5},
+				}),
+			};
+
+			for(auto face: faces) {
+				points.insert(points.end(), face.begin(), face.end());
+			}
+
+			std::vector<vertex> vertices;
+			for(auto point: points) {
+				vertices.push_back({point + glm::vec3(0, 0.5, 0), {0, 0, 0}, {0.7, 0.7, 0.7, 1}});
+			}
+			return vertices;
+		};
+
 		std::vector<vertex> make_linecube() {
 			std::vector<glm::vec3> square {
 				{-0.5, 0, -0.5},
