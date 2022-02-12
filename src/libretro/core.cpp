@@ -4,6 +4,7 @@
 
 #include <loguru.hpp>
 
+#include "volcano/graphics/meshes.hpp"
 #include "volcano/graphics/vertex.hpp"
 #include "volcano/mesh.hpp"
 #include "volcano/renderer.hpp"
@@ -94,6 +95,8 @@ RETRO_CALLCONV void retro_context_reset() {
 
 	renderer.init(vulkan);
 
+	auto grid = volcano::graphics::make_linegrid(7, 5);
+	renderer.add_mesh(grid);
 }
 
 RETRO_CALLCONV void retro_context_destroy() {
