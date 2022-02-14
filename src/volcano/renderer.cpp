@@ -541,7 +541,7 @@ namespace volcano {
 	}
 
 	renderer::renderer()
-	: main_camera(glm::pi<float>() * 0.25f, 1.0f / 1.0f, 0.1f, 100.f) {}
+	: main_camera(-glm::pi<float>() * 0.25f, -1.0f / 1.0f, 0.1f, 100.f) {}
 
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		vulkan_if = vulkan;
