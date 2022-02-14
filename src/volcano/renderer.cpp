@@ -828,7 +828,7 @@ namespace volcano {
 		cam_x += 0.1f;
 	}
 
-	const camera& renderer::get_camera() {
+	camera& renderer::get_camera() {
 		return main_camera;
 	}
 }

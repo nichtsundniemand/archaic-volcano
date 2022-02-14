@@ -81,7 +81,7 @@ namespace volcano {
 			void move_left();
 			void move_right();
 
-			const camera& get_camera();
+			camera& get_camera();
 	};
 }
 
