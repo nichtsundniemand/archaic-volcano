@@ -49,7 +49,6 @@ namespace volcano {
 
 			unsigned int index;
 
-			float cam_x, cam_y;
 			camera main_camera;
 
 			std::vector<mesh> meshes;
@@ -75,11 +74,6 @@ namespace volcano {
 				const std::vector<graphics::vertex>& vertices,
 				const kepler::transform_reference& transform
 			);
-
-			void move_forward();
-			void move_backward();
-			void move_left();
-			void move_right();
 
 			camera& get_camera();
 	};
