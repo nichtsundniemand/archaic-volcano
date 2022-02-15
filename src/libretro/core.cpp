@@ -115,6 +115,8 @@ RETRO_CALLCONV void retro_context_reset() {
 			.index_count  = 1050,
 		}
 	);
+	table_transform.set_position(glm::vec3(0, 0, -3));
+	table_transform.set_orientation(glm::quat(glm::vec3(0, glm::radians(-90.f), 0)));
 	renderer.add_mesh(table_loader.vertices(), table_transform);
 
 	volcano::mesh_loader chair_loader(
@@ -129,6 +131,7 @@ RETRO_CALLCONV void retro_context_reset() {
 			.index_count  = 276,
 		}
 	);
+	chair_transform.set_position(glm::vec3(4, 0, 0));
 	renderer.add_mesh(chair_loader.vertices(), chair_transform);
 }
 
