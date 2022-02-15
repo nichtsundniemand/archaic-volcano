@@ -100,7 +100,7 @@ RETRO_CALLCONV void retro_context_reset() {
 
 	renderer.init(vulkan);
 
-	auto grid = volcano::graphics::make_grid(7, 7);
+	auto grid = volcano::graphics::make_grid(43, 43);
 	renderer.add_mesh(grid, grid_transform);
 
 	volcano::mesh_loader table_loader(
