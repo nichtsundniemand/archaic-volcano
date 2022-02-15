@@ -91,6 +91,7 @@ static float cam_y = 0;
 
 // Core runtime stuff
 kepler::transform grid_transform;
+kepler::transform cube_transform;
 kepler::transform table_transform, chair_transform;
 
 RETRO_CALLCONV void retro_context_reset() {
@@ -111,6 +112,9 @@ RETRO_CALLCONV void retro_context_reset() {
 
 	auto grid = volcano::graphics::make_grid(43, 43);
 	renderer.add_mesh(grid, grid_transform);
+
+	auto cube = volcano::graphics::make_cube();
+	renderer.add_mesh(cube, cube_transform);
 
 	volcano::mesh_loader table_loader(
 		"data/meshes/test_house.bin",
