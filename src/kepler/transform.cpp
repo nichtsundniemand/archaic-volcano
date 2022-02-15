@@ -17,7 +17,7 @@ namespace kepler {
 		if(dirty) {
 			// Recalc matrices;
 			LOG_F(ERROR, "Hallolbob, let's do it!");
-			model_matrix = glm::translate(glm::mat4(1.0f), position);
+			model_matrix = glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(orientation);
 
 			dirty = false;
 			version++;
