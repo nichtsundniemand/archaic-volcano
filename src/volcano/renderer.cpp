@@ -541,7 +541,7 @@ namespace volcano {
 	}
 
 	renderer::renderer()
-	: main_camera(-glm::pi<float>() * 0.25f, -1.0f / 1.0f, 0.1f, 100.f) {}
+	: main_camera(-glm::pi<float>() * 0.25f, -(float)WIDTH / (float)HEIGHT, 0.1f, 100.f) {}
 
 	void renderer::init(retro_hw_render_interface_vulkan *vulkan) {
 		vulkan_if = vulkan;
@@ -687,9 +687,9 @@ namespace volcano {
 		);
 
 		VkViewport vp = {
-			.x        = (WIDTH - HEIGHT) >> 1,
+			.x        = 0,//(WIDTH - HEIGHT) >> 1,
 			.y        = 0.0f,
-			.width    = HEIGHT,
+			.width    = WIDTH,
 			.height   = HEIGHT,
 			.minDepth = 0.0f,
 			.maxDepth = 1.0f,
