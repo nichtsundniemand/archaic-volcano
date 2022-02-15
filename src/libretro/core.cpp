@@ -251,17 +251,18 @@ RETRO_API void retro_run(void) {
 			}
 
 			if(pos_changed) {
-				pos_delta = glm::normalize(pos_delta) * cube_speed;
-				LOG_F(ERROR, "delta: %f, %f, %f", pos_delta.x, pos_delta.y, pos_delta.z);
+				if(glm::length(pos_delta) != 0) {
+					pos_delta = glm::normalize(pos_delta) * cube_speed;
 
-				glm::vec3 new_pos = glm::vec3(cam_x, 0, cam_y) + pos_delta;
-				cam_x = new_pos.x;
-				cam_y = new_pos.z;
+					glm::vec3 new_pos = glm::vec3(cam_x, 0, cam_y) + pos_delta;
+					cam_x = new_pos.x;
+					cam_y = new_pos.z;
 
-				cube_transform.set_position(new_pos);
+					cube_transform.set_position(new_pos);
 
-				renderer.get_camera().set_eye(new_pos + cam_offset);
-				renderer.get_camera().set_target(new_pos);
+					renderer.get_camera().set_eye(new_pos + cam_offset);
+					renderer.get_camera().set_target(new_pos);
+				}
 			}
 		}
 		// dispatcher.do_stuff
