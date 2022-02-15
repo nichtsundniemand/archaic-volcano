@@ -192,18 +192,6 @@ namespace volcano {
 				}
 			}
 
-			for(auto vertex: vertices) {
-				LOG_F(ERROR,
-					"vertex:\n"
-					" - x: %f\n"
-					" - y: %f\n"
-					" - z: %f\n",
-					vertex.position.x,
-					vertex.position.y,
-					vertex.position.z
-				);
-			}
-
 			return vertices;
 		}
 		
