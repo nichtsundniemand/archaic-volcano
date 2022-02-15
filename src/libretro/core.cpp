@@ -191,11 +191,6 @@ RETRO_API unsigned retro_get_region(void) {
 RETRO_API void retro_run(void) {
 	renderer.dispatch();
 
-	static uint64_t frame = 0;
-	table_transform.set_position(glm::vec3(0, sin(0.035f * frame), 0));
-	chair_transform.set_position(glm::vec3(sin(0.02f * frame), 0, 1));
-	frame++;
-
 	retro_callbacks.video(RETRO_HW_FRAME_BUFFER_VALID, WIDTH, HEIGHT, 0);
 }
 
