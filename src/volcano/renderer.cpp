@@ -574,17 +574,11 @@ namespace volcano {
 	}
 
 	void renderer::update_ubo(void) {
-		static unsigned frame;
-
 		main_camera.update_matrix();
-
-		glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.3f));
-		model = glm::rotate(model, frame * 0.0031416926535f, glm::vec3(-1.0f, 0.0f, 0.0f));
-		model = glm::rotate(model, frame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		const std::vector<glm::mat4> ubo_matrices = {
 			main_camera.get_matrix(),
-			model,
+			glm::mat4(1.0f),
 		};
 
 		float *memmap_mvp = nullptr;
@@ -607,8 +601,6 @@ namespace volcano {
 				vkUnmapMemory(vulkan_if->device, cur_mesh.get_uniform(index).memory);
 			}
 		}
-
-		frame++;
 	}
 
 	void renderer::dispatch() {
