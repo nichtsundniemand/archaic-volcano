@@ -94,6 +94,8 @@ kepler::transform grid_transform;
 kepler::transform cube_transform;
 kepler::transform table_transform, chair_transform;
 
+glm::vec3 cam_offset(0, 5, 9);
+
 RETRO_CALLCONV void retro_context_reset() {
 	if(!retro_callbacks.env(RETRO_ENVIRONMENT_GET_HW_RENDER_INTERFACE, (void **)&vulkan) || !vulkan) {
 		LOG_F(FATAL, "Could not fetch HW-render interface from frontend!");
@@ -107,7 +109,7 @@ RETRO_CALLCONV void retro_context_reset() {
 
 	renderer.init(vulkan);
 
-	renderer.get_camera().set_eye(glm::vec3(cam_x, 2.0f, 20.0f + cam_y));
+	renderer.get_camera().set_eye(cam_offset);
 	renderer.get_camera().set_target(glm::vec3(0, 0, 0));
 
 	auto grid = volcano::graphics::make_grid(43, 43);
@@ -216,32 +218,50 @@ RETRO_API void retro_run(void) {
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_B)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_B");
 			}
+
+			float cube_speed = 0.05f;
+			bool pos_changed = false;
+			glm::vec3 pos_delta(0, 0, 0);
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_UP)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_UP");
-				cam_y -= 0.3f;
-				renderer.get_camera().set_eye(glm::vec3(cam_x, 2.0f, 20.0f + cam_y));
-				renderer.get_camera().set_target(glm::vec3(cam_x, 0, cam_y));
+				pos_delta.z -= cube_speed;
+
+				pos_changed = true;
 			}
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_DOWN");
-				cam_y += 0.3f;
-				renderer.get_camera().set_eye(glm::vec3(cam_x, 2.0f, 20.0f + cam_y));
-				renderer.get_camera().set_target(glm::vec3(cam_x, 0, cam_y));
+				pos_delta.z += cube_speed;
+
+				pos_changed = true;
 			}
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_LEFT");
-				cam_x -= 0.3f;
-				renderer.get_camera().set_eye(glm::vec3(cam_x, 2.0f, 20.0f + cam_y));
-				renderer.get_camera().set_target(glm::vec3(cam_x, 0, cam_y));
+				pos_delta.x -= cube_speed;
+
+				pos_changed = true;
 			}
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_RIGHT");
-				cam_x += 0.3f;
-				renderer.get_camera().set_eye(glm::vec3(cam_x, 2.0f, 20.0f + cam_y));
-				renderer.get_camera().set_target(glm::vec3(cam_x, 0, cam_y));
+				pos_delta.x += cube_speed;
+
+				pos_changed = true;
 			}
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_A)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_A");
+			}
+
+			if(pos_changed) {
+				pos_delta = glm::normalize(pos_delta) * cube_speed;
+				LOG_F(ERROR, "delta: %f, %f, %f", pos_delta.x, pos_delta.y, pos_delta.z);
+
+				glm::vec3 new_pos = glm::vec3(cam_x, 0, cam_y) + pos_delta;
+				cam_x = new_pos.x;
+				cam_y = new_pos.z;
+
+				cube_transform.set_position(new_pos);
+
+				renderer.get_camera().set_eye(new_pos + cam_offset);
+				renderer.get_camera().set_target(new_pos);
 			}
 		}
 		// dispatcher.do_stuff
