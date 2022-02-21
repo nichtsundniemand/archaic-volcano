@@ -1,3 +1,5 @@
+libretro_dep = dependency('libretro')
+
 volcano_lib = static_library(
 	'volcano',
 	'renderer.cpp',
