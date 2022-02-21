@@ -12,4 +12,7 @@ volcano_lib = static_library(
 	],
 )
 
-volcano_dep = declare_dependency(link_with: volcano_lib)
+volcano_dep = declare_dependency(
+	include_directories: src_include,
+	link_with: volcano_lib,
+)
