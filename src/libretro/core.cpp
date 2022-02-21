@@ -86,8 +86,7 @@ RETRO_API void retro_set_controller_port_device(
 	[[maybe_unused]] unsigned device
 ) {}
 
-static float cam_x = 0;
-static float cam_y = 0;
+static glm::vec3 cube_pos(0, 0, 0);
 
 // Core runtime stuff
 kepler::transform grid_transform;
@@ -224,7 +223,7 @@ RETRO_API void retro_run(void) {
 				if(!b_pressed && random_transform_count < 1024) {
 					// Just drop in a new mesh :P
 					kepler::transform& transform = random_transforms[random_transform_count];
-					transform.set_position(glm::vec3(cam_x, 0, cam_y));
+					transform.set_position(cube_pos);
 
 					auto cube = volcano::graphics::make_cube();
 					renderer.add_mesh(cube, transform);
@@ -272,14 +271,11 @@ RETRO_API void retro_run(void) {
 				if(glm::length(pos_delta) != 0) {
 					pos_delta = glm::normalize(pos_delta) * cube_speed;
 
-					glm::vec3 new_pos = glm::vec3(cam_x, 0, cam_y) + pos_delta;
-					cam_x = new_pos.x;
-					cam_y = new_pos.z;
+					cube_pos += pos_delta;
+					cube_transform.set_position(cube_pos);
 
-					cube_transform.set_position(new_pos);
-
-					renderer.get_camera().set_eye(new_pos + cam_offset);
-					renderer.get_camera().set_target(new_pos);
+					renderer.get_camera().set_eye(cube_pos + cam_offset);
+					renderer.get_camera().set_target(cube_pos);
 				}
 			}
 		}
