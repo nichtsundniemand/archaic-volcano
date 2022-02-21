@@ -94,6 +94,9 @@ kepler::transform grid_transform;
 kepler::transform cube_transform;
 kepler::transform table_transform, chair_transform;
 
+std::array<kepler::transform, 1024> random_transforms;
+unsigned int random_transform_count = 0;
+
 glm::vec3 cam_offset(0, 5, 9);
 
 RETRO_CALLCONV void retro_context_reset() {
@@ -211,12 +214,27 @@ RETRO_API void retro_run(void) {
 		LOG_SCOPE_F(INFO, "Poll Input");
 		retro_callbacks.input_poll();
 
-		short input_mask = retro_callbacks.input_state(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+		static bool b_pressed = false;
 
+		short input_mask = retro_callbacks.input_state(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
 		{
 			LOG_SCOPE_F(INFO, "Input mask: %d", input_mask);
 			if(input_mask & (1 << RETRO_DEVICE_ID_JOYPAD_B)) {
 				LOG_F(INFO, "RETRO_DEVICE_ID_JOYPAD_B");
+				if(!b_pressed && random_transform_count < 1024) {
+					// Just drop in a new mesh :P
+					kepler::transform& transform = random_transforms[random_transform_count];
+					transform.set_position(glm::vec3(cam_x, 0, cam_y));
+
+					auto cube = volcano::graphics::make_cube();
+					renderer.add_mesh(cube, transform);
+
+					random_transform_count++;
+
+					b_pressed = true;
+				}
+			} else if(b_pressed) {
+				b_pressed = false;
 			}
 
 			float cube_speed = 0.05f;
