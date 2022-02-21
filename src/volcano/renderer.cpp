@@ -775,7 +775,11 @@ namespace volcano {
 			);
 
 			// Allocate a new descriptor set using the model set-layout of the current pipeline
-			vkAllocateDescriptorSets(vulkan_if->device, &alloc_info_model, &descriptor_sets[i]);
+			if(vkAllocateDescriptorSets(
+				vulkan_if->device, &alloc_info_model, &descriptor_sets[i]
+			) != VK_SUCCESS) {
+				return;
+			}
 
 			VkDescriptorBufferInfo buffer_info = {
 				.buffer = uniform_buffers[i].buffer,
