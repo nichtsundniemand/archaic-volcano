@@ -5,12 +5,12 @@
 #include <loguru.hpp>
 
 #include <kepler/transform.hpp>
-#include "kraken/dispatcher.hpp"
-#include "volcano/graphics/meshes.hpp"
-#include "volcano/graphics/vertex.hpp"
-#include "volcano/mesh.hpp"
-#include "volcano/mesh_loader.hpp"
-#include "volcano/renderer.hpp"
+#include <kraken/dispatcher.hpp>
+#include <volcano/graphics/meshes.hpp>
+#include <volcano/graphics/vertex.hpp>
+#include <volcano/mesh.hpp>
+#include <volcano/mesh_loader.hpp>
+#include <volcano/renderer.hpp>
 
 #define WIDTH 1280
 #define HEIGHT 720
