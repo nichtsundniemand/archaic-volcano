@@ -118,7 +118,7 @@ namespace volcano {
 		VkDescriptorPoolCreateInfo pool_info = {
 			.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-			.maxSets       = 256,
+			.maxSets       = 1024,
 			.poolSizeCount = (uint32_t)pool_sizes.size(),
 			.pPoolSizes    = pool_sizes.data(),
 		};
